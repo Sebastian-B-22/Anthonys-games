@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthony's Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 40px;
+        }
+        .games-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 900px;
+        }
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: white;
+        }
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        .game-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .game-desc {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #606060;
+        }
+        .footer a {
+            color: #808080;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎮 Anthony's Games</h1>
+    <p class="subtitle">Browser games made with AI assistance</p>
+    
+    <div class="games-container">
+        <a href="knight-web-game/" class="game-card">
+            <div class="game-icon">⚔️</div>
+            <h2 class="game-title">Knight Adventure</h2>
+            <p class="game-desc">An action-packed knight game. Battle enemies and explore!</p>
+        </a>
+        
+        <a href="metroidvania-js/" class="game-card">
+            <div class="game-icon">🗡️</div>
+            <h2 class="game-title">Metroidvania</h2>
+            <p class="game-desc">Explore a vast world with 15+ rooms, bosses, shops, and power-ups!</p>
+        </a>
+    </div>
+    
+    <p class="footer">Made by Anthony with 🧭 <a href="https://github.com/Sebastian-B-22/anthonys-games">Compass</a></p>
+</body>
+</html>

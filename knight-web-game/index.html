@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knight's Adventure - Web Edition</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        #gameCanvas {
+            border: 4px solid #ffd700;
+            background: #87ceeb;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #ffd700;
+        }
+        h1 {
+            color: #ffd700;
+            text-shadow: 2px 2px #000;
+        }
+        #musicToggle {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #ffd700;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Knight's Adventure ⚔️</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls">
+        <p><strong>Controls:</strong> Arrow Keys = Move | SPACE = Jump | X = Attack</p>
+        <p id="status">Health: ❤️❤️❤️❤️❤️ | Room: Start | Coins: 0</p>
+        <button id="musicToggle">🎵 Toggle Music</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Simple music system
+        let audioContext;
+        let musicPlaying = false;
+        let currentOscillators = [];
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playNote(frequency, duration, startTime) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.frequency.value = frequency;
+            osc.type = 'square';
+            
+            gain.gain.value = 0.1;
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+            
+            currentOscillators.push(osc);
+        }
+
+        function playBackgroundMusic() {
+            if (!audioContext || !musicPlaying) return;
+            
+            const now = audioContext.currentTime;
+            const beatDuration = 0.25;
+            
+            // Simple melody
+            const melody = [
+                523, 587, 659, 587, // C D E D
+                523, 587, 659, 698, // C D E F
+                659, 698, 784, 698, // E F G F
+                659, 587, 523, 440  // E D C A
+            ];
+            
+            melody.forEach((freq, i) => {
+                playNote(freq, beatDuration * 0.8, now + i * beatDuration);
+            });
+            
+            // Schedule next loop
+            setTimeout(() => playBackgroundMusic(), melody.length * beatDuration * 1000);
+        }
+
+        document.getElementById('musicToggle').addEventListener('click', () => {
+            initAudio();
+            musicPlaying = !musicPlaying;
+            if (musicPlaying) {
+                playBackgroundMusic();
+            } else {
+                currentOscillators.forEach(osc => {
+                    try { osc.stop(); } catch(e) {}
+                });
+                currentOscillators = [];
+            }
+        });
+
+        // Game state
+        const keys = {};
+        let enemiesDefeated = 0;
+        let currentRoom = 'start';
+        let dragonDefeated = false;
+        let coins = 0;
+
+        // Player
+        const player = {
+            x: 100,
+            y: 400,
+            width: 30,
+            height: 40,
+            velX: 0,
+            velY: 0,
+            speed: 5,
+            jumpPower: 12,
+            gravity: 0.6,
+            onGround: false,
+            health: 5,
+            maxHealth: 5,
+            attacking: false,
+            attackTimer: 0,
+            facingRight: true,
+            invincible: 0
+        };
+
+        // Rooms
+        const rooms = {
+            start: {
+                platforms: [
+                    {x: 0, y: 550, width: 400, height: 50},
+                    {x: 200, y: 450, width: 150, height: 20},
+                    {x: 450, y: 400, width: 150, height: 20},
+                    {x: 650, y: 350, width: 150, height: 20}
+                ],
+                enemies: []
+            },
+            knights: {
+                platforms: [
+                    {x: 0, y: 550, width: 800, height: 50},
+                    {x: 100, y: 450, width: 150, height: 20},
+                    {x: 500, y: 450, width: 150, height: 20}
+                ],
+                enemies: [
+                    {x: 250, y: 515, width: 30, height: 35, startX: 250, direction: 1, speed: 2, range: 100, health: 2, hitFlash: 0},
+                    {x: 550, y: 415, width: 30, height: 35, startX: 550, direction: 1, speed: 2, range: 80, health: 2, hitFlash: 0}
+                ]
+            },
+            dragon: {
+                platforms: [
+                    {x: 0, y: 550, width: 800, height: 50},
+                    {x: 100, y: 400, width: 100, height: 20},
+                    {x: 600, y: 400, width: 100, height: 20}
+                ],
+                enemies: [],
+                boss: {
+                    x: 300,
+                    y: 470,
+                    width: 100,
+                    height: 80,
+                    health: 15,
+                    maxHealth: 15,
+                    direction: 1,
+                    speed: 1.5,
+                    startX: 300,
+                    range: 150,
+                    hitFlash: 0,
+                    fireballs: [],
+                    fireTimer: 0
+                }
+            },
+            treasure: {
+                platforms: [
+                    {x: 0, y: 550, width: 800, height: 50},
+                    {x: 350, y: 480, width: 100, height: 20}
+                ],
+                enemies: [],
+                chest: {x: 370, y: 445, opened: false}
+            },
+            shop: {
+                platforms: [
+                    {x: 0, y: 550, width: 800, height: 50}
+                ],
+                enemies: [],
+                shopkeeper: {x: 380, y: 505}
+            },
+            victory: {
+                platforms: [
+                    {x: 0, y: 550, width: 800, height: 50},
+                    {x: 300, y: 450, width: 200, height: 20}
+                ],
+                enemies: []
+            }
+        };
+
+        // Input
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if ((e.key === ' ' || e.key === 'Spacebar') && player.onGround) {
+                player.velY = -player.jumpPower;
+                e.preventDefault();
+            }
+            if (e.key === 'x' || e.key === 'X') {
+                if (!player.attacking) {
+                    player.attacking = true;
+                    player.attackTimer = 15;
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        function drawKnight() {
+            if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2 === 0) return;
+            const x = player.x, y = player.y;
+            ctx.fillStyle = '#c0c0c0';
+            ctx.fillRect(x + 5, y + 15, 20, 20);
+            ctx.fillStyle = '#dcdcdc';
+            ctx.fillRect(x + 7, y + 17, 16, 16);
+            ctx.fillStyle = '#c0c0c0';
+            ctx.beginPath();
+            ctx.ellipse(x + 15, y + 12, 8, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 10, y + 10, 10, 4);
+            ctx.fillStyle = '#a9a9a9';
+            ctx.fillRect(x + 8, y + 35, 6, 5);
+            ctx.fillRect(x + 16, y + 35, 6, 5);
+            const swordLength = player.attacking ? 22 : 18;
+            ctx.fillStyle = '#ffd700';
+            if (player.facingRight) {
+                ctx.fillRect(x + 25, y + 18, swordLength, 3);
+                if (player.attacking) {
+                    ctx.fillStyle = '#00ffff';
+                    ctx.globalAlpha = 0.5;
+                    for (let i = 0; i < 5; i++) {
+                        ctx.fillRect(x + 30 + Math.random() * 15, y + 15 + Math.random() * 10, 4, 4);
+                    }
+                    ctx.globalAlpha = 1;
+                }
+            } else {
+                ctx.fillRect(x - 10 - swordLength, y + 18, swordLength, 3);
+                if (player.attacking) {
+                    ctx.fillStyle = '#00ffff';
+                    ctx.globalAlpha = 0.5;
+                    for (let i = 0; i < 5; i++) {
+                        ctx.fillRect(x - 20 - Math.random() * 15, y + 15 + Math.random() * 10, 4, 4);
+                    }
+                    ctx.globalAlpha = 1;
+                }
+            }
+        }
+
+        function drawEnemy(enemy) {
+            const color = (enemy.hitFlash > 0 && Math.floor(enemy.hitFlash / 2) % 2 === 0) ? '#fff' : '#000';
+            ctx.fillStyle = color;
+            ctx.fillRect(enemy.x + 5, enemy.y + 12, 20, 18);
+            ctx.beginPath();
+            ctx.ellipse(enemy.x + 15, enemy.y + 10, 8, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(enemy.x + 10, enemy.y + 9, 10, 4);
+            ctx.fillStyle = color;
+            ctx.fillRect(enemy.x + 8, enemy.y + 30, 6, 5);
+            ctx.fillRect(enemy.x + 16, enemy.y + 30, 6, 5);
+        }
+
+        function drawDragon(dragon) {
+            const color = (dragon.hitFlash > 0 && Math.floor(dragon.hitFlash / 3) % 2 === 0) ? '#fff' : '#8b0000';
+            const x = dragon.x, y = dragon.y;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(x + 40, y + 40, 35, 22, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(x + 75, y + 25, 15, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffff00';
+            ctx.beginPath();
+            ctx.ellipse(x + 80, y + 22, 6, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x + 82, y + 22, 3, 5);
+            ctx.fillStyle = '#696969';
+            ctx.beginPath();
+            ctx.moveTo(x + 70, y + 15);
+            ctx.lineTo(x + 68, y + 5);
+            ctx.lineTo(x + 74, y + 12);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x + 86, y + 15);
+            ctx.lineTo(x + 88, y + 5);
+            ctx.lineTo(x + 82, y + 12);
+            ctx.fill();
+            ctx.fillStyle = '#a52a2a';
+            ctx.beginPath();
+            ctx.moveTo(x + 30, y + 30);
+            ctx.lineTo(x + 10, y + 10);
+            ctx.lineTo(x + 25, y + 40);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x + 60, y + 30);
+            ctx.lineTo(x + 80, y + 10);
+            ctx.lineTo(x + 65, y + 40);
+            ctx.fill();
+            const barWidth = 100, barHeight = 8;
+            const healthPercent = dragon.health / dragon.maxHealth;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x, y - 15, barWidth, barHeight);
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(x, y - 15, barWidth * healthPercent, barHeight);
+            ctx.strokeStyle = '#ffd700';
+            ctx.strokeRect(x, y - 15, barWidth, barHeight);
+            dragon.fireballs.forEach(fb => {
+                ctx.fillStyle = '#ff8c00';
+                ctx.beginPath();
+                ctx.arc(fb.x, fb.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffff00';
+                ctx.beginPath();
+                ctx.arc(fb.x, fb.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawChest(chest) {
+            if (!chest.opened) {
+                ctx.fillStyle = '#8b4513';
+                ctx.fillRect(chest.x, chest.y + 10, 40, 20);
+                ctx.fillRect(chest.x, chest.y, 40, 12);
+                ctx.fillStyle = '#ffd700';
+                ctx.fillRect(chest.x + 17, chest.y + 13, 6, 6);
+            } else {
+                ctx.fillStyle = '#8b4513';
+                ctx.fillRect(chest.x, chest.y + 10, 40, 20);
+                ctx.fillRect(chest.x, chest.y - 5, 40, 12);
+            }
+        }
+
+        function drawShopkeeper(sk) {
+            ctx.fillStyle = '#800080';
+            ctx.beginPath();
+            ctx.ellipse(sk.x + 17, sk.y + 18, 12, 13, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffdbac';
+            ctx.beginPath();
+            ctx.arc(sk.x + 17, sk.y + 12, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#8b0000';
+            ctx.beginPath();
+            ctx.moveTo(sk.x + 10, sk.y + 5);
+            ctx.lineTo(sk.x + 24, sk.y + 5);
+            ctx.lineTo(sk.x + 17, sk.y - 3);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(sk.x + 13, sk.y + 11, 2, 2);
+            ctx.fillRect(sk.x + 21, sk.y + 11, 2, 2);
+        }
+
+        function update() {
+            const room = rooms[currentRoom];
+            player.velX = 0;
+            if (keys['ArrowLeft']) {
+                player.velX = -player.speed;
+                player.facingRight = false;
+            }
+            if (keys['ArrowRight']) {
+                player.velX = player.speed;
+                player.facingRight = true;
+            }
+            player.velY += player.gravity;
+            player.x += player.velX;
+            player.y += player.velY;
+            if (player.attackTimer > 0) player.attackTimer--;
+            else player.attacking = false;
+            if (player.invincible > 0) player.invincible--;
+            player.onGround = false;
+            room.platforms.forEach(platform => {
+                if (player.x < platform.x + platform.width &&
+                    player.x + player.width > platform.x &&
+                    player.y + player.height > platform.y &&
+                    player.y + player.height < platform.y + platform.height &&
+                    player.velY > 0) {
+                    player.y = platform.y - player.height;
+                    player.velY = 0;
+                    player.onGround = true;
+                }
+            });
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            if (player.y > canvas.height) {
+                player.y = 400;
+                player.velY = 0;
+            }
+
+            // Room transitions
+            if (player.x >= canvas.width - player.width && currentRoom === 'start') {
+                currentRoom = 'knights'; player.x = 10;
+            } else if (player.x <= 0 && currentRoom === 'knights') {
+                currentRoom = 'start'; player.x = canvas.width - player.width - 10;
+            } else if (player.x >= canvas.width - player.width && currentRoom === 'knights') {
+                currentRoom = 'dragon'; player.x = 10;
+            } else if (player.x <= 0 && currentRoom === 'dragon' && !dragonDefeated) {
+                currentRoom = 'knights'; player.x = canvas.width - player.width - 10;
+            } else if (player.x >= canvas.width - player.width && currentRoom === 'dragon' && dragonDefeated) {
+                currentRoom = 'treasure'; player.x = 10;
+            } else if (player.x <= 0 && currentRoom === 'treasure') {
+                currentRoom = 'dragon'; player.x = canvas.width - player.width - 10;
+            } else if (player.x >= canvas.width - player.width && currentRoom === 'treasure') {
+                currentRoom = 'shop'; player.x = 10;
+            } else if (player.x <= 0 && currentRoom === 'shop') {
+                currentRoom = 'treasure'; player.x = canvas.width - player.width - 10;
+            } else if (player.x >= canvas.width - player.width && currentRoom === 'shop') {
+                currentRoom = 'victory'; player.x = 10;
+            }
+
+            // Chest
+            if (room.chest && !room.chest.opened) {
+                const pr = {x: player.x, y: player.y, w: player.width, h: player.height};
+                const cr = {x: room.chest.x, y: room.chest.y, w: 40, h: 30};
+                if (pr.x < cr.x + cr.w && pr.x + pr.w > cr.x && pr.y < cr.y + cr.h && pr.y + pr.h > cr.y) {
+                    room.chest.opened = true;
+                    coins += 150;
+                }
+            }
+
+            // Enemies
+            if (room.enemies) {
+                room.enemies.forEach((enemy, index) => {
+                    enemy.x += enemy.speed * enemy.direction;
+                    if (Math.abs(enemy.x - enemy.startX) > enemy.range) enemy.direction *= -1;
+                    if (enemy.hitFlash > 0) enemy.hitFlash--;
+                    if (player.attacking) {
+                        const attackX = player.facingRight ? player.x + player.width : player.x - 35;
+                        const ar = {x: attackX, y: player.y + 10, w: 35, h: 20};
+                        if (ar.x < enemy.x + enemy.width && ar.x + ar.w > enemy.x && ar.y < enemy.y + enemy.height && ar.y + ar.h > enemy.y) {
+                            enemy.health--;
+                            enemy.hitFlash = 10;
+                            if (enemy.health <= 0) {
+                                room.enemies.splice(index, 1);
+                                enemiesDefeated++;
+                            }
+                        }
+                    }
+                    if (player.x < enemy.x + enemy.width && player.x + player.width > enemy.x &&
+                        player.y < enemy.y + enemy.height && player.y + player.height > enemy.y && player.invincible === 0) {
+                        player.health--;
+                        player.invincible = 90;
+                        if (player.health <= 0) {
+                            player.x = 100; player.y = 400; player.health = player.maxHealth; currentRoom = 'start';
+                        }
+                    }
+                });
+            }
+
+            // Dragon
+            if (room.boss && room.boss.health > 0) {
+                const dragon = room.boss;
+                dragon.x += dragon.speed * dragon.direction;
+                if (Math.abs(dragon.x - dragon.startX) > dragon.range) dragon.direction *= -1;
+                if (dragon.hitFlash > 0) dragon.hitFlash--;
+                dragon.fireTimer++;
+                if (dragon.fireTimer > 90) {
+                    dragon.fireballs.push({x: dragon.x + 50, y: dragon.y + 40, velX: dragon.direction * 5});
+                    dragon.fireTimer = 0;
+                }
+                dragon.fireballs.forEach((fb, i) => {
+                    fb.x += fb.velX;
+                    if (fb.x < -20 || fb.x > 820) dragon.fireballs.splice(i, 1);
+                    if (Math.abs(fb.x - (player.x + 15)) < 20 && Math.abs(fb.y - (player.y + 20)) < 20 && player.invincible === 0) {
+                        player.health--;
+                        player.invincible = 90;
+                        dragon.fireballs.splice(i, 1);
+                        if (player.health <= 0) {
+                            player.x = 100; player.y = 400; player.health = player.maxHealth; currentRoom = 'start';
+                        }
+                    }
+                });
+                if (player.attacking) {
+                    const attackX = player.facingRight ? player.x + player.width : player.x - 35;
+                    const ar = {x: attackX, y: player.y + 10, w: 35, h: 20};
+                    if (ar.x < dragon.x + dragon.width && ar.x + ar.w > dragon.x && ar.y < dragon.y + dragon.height && ar.y + ar.h > dragon.y) {
+                        dragon.health--;
+                        dragon.hitFlash = 15;
+                        if (dragon.health <= 0) dragonDefeated = true;
+                    }
+                }
+            }
+
+            const hearts = '❤️'.repeat(player.health) + '🖤'.repeat(player.maxHealth - player.health);
+            let roomName = currentRoom.charAt(0).toUpperCase() + currentRoom.slice(1);
+            document.getElementById('status').textContent = `Health: ${hearts} | Room: ${roomName} | Coins: ${coins}`;
+        }
+
+        function draw() {
+            const room = rooms[currentRoom];
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            room.platforms.forEach(platform => {
+                ctx.fillStyle = '#696969';
+                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+                ctx.fillStyle = '#2f4f4f';
+                ctx.fillRect(platform.x, platform.y, platform.width, 5);
+                ctx.strokeStyle = '#fff';
+                ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+            });
+            if (room.enemies) room.enemies.forEach(drawEnemy);
+            if (room.boss && room.boss.health > 0) drawDragon(room.boss);
+            if (room.chest) drawChest(room.chest);
+            if (room.shopkeeper) drawShopkeeper(room.shopkeeper);
+            drawKnight();
+
+            if (currentRoom === 'victory') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(100, 150, 600, 200);
+                ctx.fillStyle = '#ffd700';
+                ctx.font = '48px "Courier New"';
+                ctx.textAlign = 'center';
+                ctx.fillText('🎉 VICTORY! 🎉', canvas.width / 2, 220);
+                ctx.font = '24px "Courier New"';
+                ctx.fillText('You completed the adventure!', canvas.width / 2, 270);
+                ctx.fillText(`Enemies defeated: ${enemiesDefeated}`, canvas.width / 2, 310);
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    </script>
+</body>
+</html>
