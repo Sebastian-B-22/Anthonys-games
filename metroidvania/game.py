@@ -1127,9 +1127,9 @@ def create_rooms():
     rooms['dash_room'] = Room('dash_room',
         platforms=[
             pygame.Rect(0,550,800,50),
-            pygame.Rect(300,400,200,20),
+            pygame.Rect(300,450,200,20),
         ],
-        items=[Item(360,360,'dash',CYAN)])
+        items=[Item(370,410,'dash',CYAN)])
 
     # Obby Room
     rooms['obby'] = Room('obby', platforms=[
@@ -1429,8 +1429,9 @@ def main():
                         
                         if not room.boss.is_alive():
                             dragon_defeated = True
-                            message = "🎉 YOU DEFEATED THE DRAGON! The kingdom is saved! 🎉"
-                            message_timer = 9999
+                            player.has_dash = True
+                            message = "🐉 DRAGON DEFEATED! Dash unlocked! Press D!"
+                            message_timer = 200
             
             player_rect = pygame.Rect(player.x, player.y, player.width, player.height)
             for item in room.items:
@@ -1441,6 +1442,19 @@ def main():
                         if item.item_type == 'double_jump':
                             player.has_double_jump = True
                             message = "DOUBLE JUMP unlocked! Press UP twice!"
+                            message_timer = 180
+                        elif item.item_type == 'dash':
+                            player.has_dash = True
+                            message = "DASH UNLOCKED! Press D to dash!"
+                            message_timer = 180
+                        elif item.item_type == 'map':
+                            player.has_map = True
+                            message = "MAP ACQUIRED! Now you can see where you are!"
+                            message_timer = 180
+                        elif item.item_type == 'heart_upgrade':
+                            player.max_health += 1
+                            player.health = player.max_health
+                            message = "MAX HEALTH +1!"
                             message_timer = 180
             
             # Room transitions
@@ -1477,6 +1491,74 @@ def main():
                 if player.x <= 5 and not dragon_defeated:
                     current_room = 'knights'
                     player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5 and dragon_defeated:
+                    current_room = 'obby'
+                    player.x, player.y = 50, 500
+                    message, message_timer = "You defeated the dragon! PARKOUR TIME!", 180
+            elif current_room == 'obby':
+                # Obby fall reset is handled earlier
+                if player.x >= 750 and player.y < 350:
+                    current_room = 'cartographer'
+                    player.x = 10
+                    message, message_timer = "Cartographer's Room!", 120
+                elif player.x >= SCREEN_WIDTH - player.width - 5 and player.y < 200:
+                    current_room = 'skeletons'
+                    player.x = 10
+                    message, message_timer = "SKELETONS! 💀", 120
+                elif player.x <= 5:
+                    current_room = 'dragon'
+                    player.x = SCREEN_WIDTH - player.width - 10
+            elif current_room == 'cartographer':
+                if player.x <= 5:
+                    current_room = 'obby'
+                    player.x = 740
+                    player.y = 280
+            elif current_room == 'skeletons':
+                if player.x <= 5:
+                    current_room = 'obby'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5:
+                    current_room = 'skeleton_boss'
+                    player.x = 10
+                    message, message_timer = "SKELETON BOSS!", 150
+            elif current_room == 'skeleton_boss':
+                if player.x <= 5:
+                    current_room = 'skeletons'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5:
+                    current_room = 'treasure'
+                    player.x = 10
+                    message, message_timer = "Treasure!", 120
+            elif current_room == 'treasure':
+                if player.x <= 5:
+                    current_room = 'skeleton_boss'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5:
+                    current_room = 'shop'
+                    player.x = 10
+                    message, message_timer = "Shop! Press X near merchant!", 150
+            elif current_room == 'shop':
+                if player.x <= 5:
+                    current_room = 'treasure'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5:
+                    current_room = 'cliffs'
+                    player.x = 10
+                    message, message_timer = "THE CLIFFS! Flying enemies!", 150
+            elif current_room == 'cliffs':
+                if player.x <= 5:
+                    current_room = 'shop'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5 and player.y < 200:
+                    current_room = 'crystal_plains'
+                    player.x = 10
+                    message, message_timer = "Crystal Plains!", 120
+            elif current_room == 'crystal_plains':
+                if player.x <= 5:
+                    current_room = 'cliffs'
+                    player.x = SCREEN_WIDTH - player.width - 10
+                elif player.x >= SCREEN_WIDTH - player.width - 5:
+                    message, message_timer = "🎉 YOU WIN! Game complete! 🎉", 9999
         
         # Draw
         screen.fill(WHITE)

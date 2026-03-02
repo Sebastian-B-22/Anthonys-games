@@ -1,0 +1,18 @@
+{
+  "currentWeekGoals": [
+    "Goal 1 - placeholder (pull from Convex)",
+    "Goal 2 - placeholder (pull from Convex)",
+    "Goal 3 - placeholder (pull from Convex)"
+  ],
+  "streaks": {
+    "checkInStreak": 0,
+    "lastCheckIn": null,
+    "longestStreak": 0
+  },
+  "history": [],
+  "config": {
+    "checkInTime": "18:00",
+    "timezone": "America/Los_Angeles",
+    "telegramChatId": "8271020476"
+  }
+}
