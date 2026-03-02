@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Memory</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .stats { font-size: 1.5rem; margin-bottom: 30px; }
+        .number-display {
+            font-size: 4rem;
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 30px 50px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            min-width: 200px;
+            text-align: center;
+            letter-spacing: 10px;
+        }
+        input {
+            font-size: 2rem;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            text-align: center;
+            width: 250px;
+            font-family: monospace;
+            letter-spacing: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #e74c3c;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .hidden { display: none; }
+        #message { margin-top: 20px; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>🔢 Number Memory</h1>
+    <div class="stats">Level: <span id="level">1</span></div>
+    <div class="number-display" id="display">Ready?</div>
+    <input type="text" id="input" class="hidden" placeholder="Enter the number" maxlength="20">
+    <button id="submitBtn" class="hidden">Submit</button>
+    <button id="startBtn">Start Game</button>
+    <div id="message"></div>
+    
+    <script>
+        const display = document.getElementById('display');
+        const input = document.getElementById('input');
+        const submitBtn = document.getElementById('submitBtn');
+        const startBtn = document.getElementById('startBtn');
+        const levelDisplay = document.getElementById('level');
+        const message = document.getElementById('message');
+        
+        let currentNumber = '';
+        let level = 1;
+        
+        function generateNumber(length) {
+            let num = '';
+            for (let i = 0; i < length; i++) {
+                num += Math.floor(Math.random() * 10);
+            }
+            return num;
+        }
+        
+        function startRound() {
+            message.textContent = '';
+            input.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+            
+            currentNumber = generateNumber(level + 2);
+            display.textContent = currentNumber;
+            
+            const showTime = 1000 + (level * 500);
+            
+            setTimeout(() => {
+                display.textContent = '?';
+                input.classList.remove('hidden');
+                submitBtn.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }, showTime);
+        }
+        
+        function checkAnswer() {
+            if (input.value === currentNumber) {
+                level++;
+                levelDisplay.textContent = level;
+                message.textContent = '✓ Correct!';
+                message.style.color = '#2ecc71';
+                setTimeout(startRound, 1000);
+            } else {
+                message.textContent = `✗ Wrong! It was ${currentNumber}. You reached level ${level}!`;
+                message.style.color = '#e74c3c';
+                input.classList.add('hidden');
+                submitBtn.classList.add('hidden');
+                startBtn.classList.remove('hidden');
+                startBtn.textContent = 'Play Again';
+            }
+        }
+        
+        submitBtn.addEventListener('click', checkAnswer);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+        
+        startBtn.addEventListener('click', () => {
+            level = 1;
+            levelDisplay.textContent = '1';
+            startBtn.classList.add('hidden');
+            startRound();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minigames Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid #444;
+            z-index: 100;
+        }
+        .back-btn:hover {
+            border-color: #fff;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        .game-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .game-title {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .game-desc {
+            font-size: 0.8rem;
+            color: #a0a0a0;
+        }
+        .category {
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #606060;
+        }
+        footer a {
+            color: #808080;
+        }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-btn">← Back</a>
+    
+    <header>
+        <h1>🎮 Minigames Hub</h1>
+        <p class="subtitle">15 quick games to test your skills!</p>
+    </header>
+    
+    <h2 class="category">⚡ Reaction & Speed</h2>
+    <div class="games-grid">
+        <a href="click-speed.html" class="game-card">
+            <div class="game-icon">👆</div>
+            <h3 class="game-title">Click Speed</h3>
+            <p class="game-desc">How fast can you click?</p>
+        </a>
+        <a href="reaction-time.html" class="game-card">
+            <div class="game-icon">⚡</div>
+            <h3 class="game-title">Reaction Time</h3>
+            <p class="game-desc">Test your reflexes!</p>
+        </a>
+        <a href="aim-trainer.html" class="game-card">
+            <div class="game-icon">🎯</div>
+            <h3 class="game-title">Aim Trainer</h3>
+            <p class="game-desc">Hit the targets!</p>
+        </a>
+        <a href="whack-a-mole.html" class="game-card">
+            <div class="game-icon">🔨</div>
+            <h3 class="game-title">Whack-a-Mole</h3>
+            <p class="game-desc">Smash the moles!</p>
+        </a>
+    </div>
+    
+    <h2 class="category">🧠 Brain & Memory</h2>
+    <div class="games-grid">
+        <a href="memory-match.html" class="game-card">
+            <div class="game-icon">🃏</div>
+            <h3 class="game-title">Memory Match</h3>
+            <p class="game-desc">Find the pairs!</p>
+        </a>
+        <a href="simon-says.html" class="game-card">
+            <div class="game-icon">🔴</div>
+            <h3 class="game-title">Simon Says</h3>
+            <p class="game-desc">Repeat the pattern!</p>
+        </a>
+        <a href="number-memory.html" class="game-card">
+            <div class="game-icon">🔢</div>
+            <h3 class="game-title">Number Memory</h3>
+            <p class="game-desc">Remember the numbers!</p>
+        </a>
+        <a href="color-match.html" class="game-card">
+            <div class="game-icon">🎨</div>
+            <h3 class="game-title">Color Match</h3>
+            <p class="game-desc">Don't get tricked!</p>
+        </a>
+    </div>
+    
+    <h2 class="category">🕹️ Arcade Classics</h2>
+    <div class="games-grid">
+        <a href="snake.html" class="game-card">
+            <div class="game-icon">🐍</div>
+            <h3 class="game-title">Snake</h3>
+            <p class="game-desc">Eat and grow!</p>
+        </a>
+        <a href="pong.html" class="game-card">
+            <div class="game-icon">🏓</div>
+            <h3 class="game-title">Pong</h3>
+            <p class="game-desc">Classic paddle game!</p>
+        </a>
+        <a href="flappy.html" class="game-card">
+            <div class="game-icon">🐦</div>
+            <h3 class="game-title">Flappy Jump</h3>
+            <p class="game-desc">Don't hit the pipes!</p>
+        </a>
+        <a href="breakout.html" class="game-card">
+            <div class="game-icon">🧱</div>
+            <h3 class="game-title">Breakout</h3>
+            <p class="game-desc">Break all the bricks!</p>
+        </a>
+    </div>
+    
+    <h2 class="category">🎲 Quick Fun</h2>
+    <div class="games-grid">
+        <a href="tic-tac-toe.html" class="game-card">
+            <div class="game-icon">⭕</div>
+            <h3 class="game-title">Tic Tac Toe</h3>
+            <p class="game-desc">Beat the AI!</p>
+        </a>
+        <a href="cookie-clicker.html" class="game-card">
+            <div class="game-icon">🍪</div>
+            <h3 class="game-title">Cookie Clicker</h3>
+            <p class="game-desc">Click for cookies!</p>
+        </a>
+        <a href="typing-speed.html" class="game-card">
+            <div class="game-icon">⌨️</div>
+            <h3 class="game-title">Typing Speed</h3>
+            <p class="game-desc">Type the words!</p>
+        </a>
+    </div>
+    
+    <footer>
+        <p>Made by Anthony with 🧭 <a href="../">Compass</a></p>
+    </footer>
+</body>
+</html>

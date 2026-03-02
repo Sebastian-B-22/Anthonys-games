@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .stats { font-size: 1.5rem; margin-bottom: 20px; }
+        canvas {
+            border: 4px solid #fff;
+            border-radius: 10px;
+            background: #000;
+        }
+        .controls { margin-top: 15px; color: #888; }
+        button {
+            margin-top: 15px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: #3498db;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>🏓 Pong</h1>
+    <div class="stats">You: <span id="playerScore">0</span> | AI: <span id="aiScore">0</span></div>
+    <canvas id="game" width="600" height="400"></canvas>
+    <p class="controls">Move mouse or use ↑↓ keys</p>
+    <button id="startBtn">Start Game</button>
+    
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const playerScoreDisplay = document.getElementById('playerScore');
+        const aiScoreDisplay = document.getElementById('aiScore');
+        const startBtn = document.getElementById('startBtn');
+        
+        const paddleWidth = 10, paddleHeight = 80;
+        const ballSize = 10;
+        
+        let playerY = canvas.height / 2 - paddleHeight / 2;
+        let aiY = canvas.height / 2 - paddleHeight / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 3;
+        let playerScore = 0;
+        let aiScore = 0;
+        let gameRunning = false;
+        let animationId;
+        
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Center line
+            ctx.strokeStyle = '#333';
+            ctx.setLineDash([10, 10]);
+            ctx.beginPath();
+            ctx.moveTo(canvas.width / 2, 0);
+            ctx.lineTo(canvas.width / 2, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Paddles
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(20, playerY, paddleWidth, paddleHeight);
+            ctx.fillRect(canvas.width - 30, aiY, paddleWidth, paddleHeight);
+            
+            // Ball
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function update() {
+            if (!gameRunning) return;
+            
+            // Move ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            
+            // Ball collision with top/bottom
+            if (ballY <= ballSize || ballY >= canvas.height - ballSize) {
+                ballSpeedY = -ballSpeedY;
+            }
+            
+            // Ball collision with player paddle
+            if (ballX <= 30 + ballSize && ballY > playerY && ballY < playerY + paddleHeight) {
+                ballSpeedX = -ballSpeedX * 1.05;
+                const hitPos = (ballY - playerY) / paddleHeight;
+                ballSpeedY = (hitPos - 0.5) * 10;
+            }
+            
+            // Ball collision with AI paddle
+            if (ballX >= canvas.width - 40 && ballY > aiY && ballY < aiY + paddleHeight) {
+                ballSpeedX = -ballSpeedX * 1.05;
+            }
+            
+            // AI movement
+            const aiCenter = aiY + paddleHeight / 2;
+            if (aiCenter < ballY - 20) aiY += 4;
+            if (aiCenter > ballY + 20) aiY -= 4;
+            
+            // Score
+            if (ballX <= 0) {
+                aiScore++;
+                aiScoreDisplay.textContent = aiScore;
+                resetBall();
+            }
+            if (ballX >= canvas.width) {
+                playerScore++;
+                playerScoreDisplay.textContent = playerScore;
+                resetBall();
+            }
+            
+            draw();
+            animationId = requestAnimationFrame(update);
+        }
+        
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = (Math.random() > 0.5 ? 5 : -5);
+            ballSpeedY = (Math.random() - 0.5) * 6;
+        }
+        
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            playerY = e.clientY - rect.top - paddleHeight / 2;
+            playerY = Math.max(0, Math.min(canvas.height - paddleHeight, playerY));
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') playerY = Math.max(0, playerY - 20);
+            if (e.key === 'ArrowDown') playerY = Math.min(canvas.height - paddleHeight, playerY + 20);
+        });
+        
+        startBtn.addEventListener('click', () => {
+            playerScore = 0;
+            aiScore = 0;
+            playerScoreDisplay.textContent = '0';
+            aiScoreDisplay.textContent = '0';
+            gameRunning = true;
+            startBtn.style.display = 'none';
+            resetBall();
+            update();
+        });
+        
+        draw();
+    </script>
+</body>
+</html>

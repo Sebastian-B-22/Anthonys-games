@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .stats { font-size: 1.3rem; margin-bottom: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 10px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cell:hover { background: rgba(255,255,255,0.2); }
+        .cell.x { color: #3498db; }
+        .cell.o { color: #e74c3c; }
+        #message {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            min-height: 40px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: #9b59b6;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>⭕ Tic Tac Toe</h1>
+    <div class="stats">You: X | AI: O</div>
+    <div class="grid" id="grid"></div>
+    <div id="message">Your turn!</div>
+    <button id="resetBtn">New Game</button>
+    
+    <script>
+        const grid = document.getElementById('grid');
+        const message = document.getElementById('message');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let gameOver = false;
+        
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+        
+        function createBoard() {
+            grid.innerHTML = '';
+            board = ['', '', '', '', '', '', '', '', ''];
+            gameOver = false;
+            message.textContent = 'Your turn!';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => playerMove(i));
+                grid.appendChild(cell);
+            }
+        }
+        
+        function checkWin(player) {
+            return winPatterns.some(pattern => 
+                pattern.every(index => board[index] === player)
+            );
+        }
+        
+        function checkDraw() {
+            return board.every(cell => cell !== '');
+        }
+        
+        function updateCell(index, player) {
+            board[index] = player;
+            const cell = grid.children[index];
+            cell.textContent = player;
+            cell.classList.add(player.toLowerCase());
+        }
+        
+        function playerMove(index) {
+            if (gameOver || board[index] !== '') return;
+            
+            updateCell(index, 'X');
+            
+            if (checkWin('X')) {
+                message.textContent = '🎉 You Win!';
+                gameOver = true;
+                return;
+            }
+            
+            if (checkDraw()) {
+                message.textContent = "It's a Draw!";
+                gameOver = true;
+                return;
+            }
+            
+            message.textContent = 'AI thinking...';
+            setTimeout(aiMove, 500);
+        }
+        
+        function aiMove() {
+            // Try to win
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === '') {
+                    board[i] = 'O';
+                    if (checkWin('O')) {
+                        updateCell(i, 'O');
+                        message.textContent = '🤖 AI Wins!';
+                        gameOver = true;
+                        return;
+                    }
+                    board[i] = '';
+                }
+            }
+            
+            // Block player
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === '') {
+                    board[i] = 'X';
+                    if (checkWin('X')) {
+                        board[i] = '';
+                        updateCell(i, 'O');
+                        if (checkDraw()) {
+                            message.textContent = "It's a Draw!";
+                            gameOver = true;
+                        } else {
+                            message.textContent = 'Your turn!';
+                        }
+                        return;
+                    }
+                    board[i] = '';
+                }
+            }
+            
+            // Take center
+            if (board[4] === '') {
+                updateCell(4, 'O');
+                message.textContent = 'Your turn!';
+                return;
+            }
+            
+            // Take corner
+            const corners = [0, 2, 6, 8];
+            const emptyCorners = corners.filter(i => board[i] === '');
+            if (emptyCorners.length > 0) {
+                const choice = emptyCorners[Math.floor(Math.random() * emptyCorners.length)];
+                updateCell(choice, 'O');
+                message.textContent = 'Your turn!';
+                return;
+            }
+            
+            // Take any
+            const emptyCells = board.map((cell, i) => cell === '' ? i : -1).filter(i => i !== -1);
+            if (emptyCells.length > 0) {
+                const choice = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                updateCell(choice, 'O');
+                
+                if (checkDraw()) {
+                    message.textContent = "It's a Draw!";
+                    gameOver = true;
+                } else {
+                    message.textContent = 'Your turn!';
+                }
+            }
+        }
+        
+        resetBtn.addEventListener('click', createBoard);
+        createBoard();
+    </script>
+</body>
+</html>

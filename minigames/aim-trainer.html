@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Trainer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        .stats {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            text-align: right;
+        }
+        .game-area {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        .target {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ff0040 30%, #ff6680 60%, #ffccdd 100%);
+            border-radius: 50%;
+            cursor: crosshair;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s;
+        }
+        .target:hover { transform: translate(-50%, -50%) scale(1.1); }
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        .start-screen h1 { font-size: 3rem; margin-bottom: 20px; }
+        .start-screen button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: #ff0040;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <div class="stats">
+        <div>Score: <span id="score">0</span>/30</div>
+        <div>Time: <span id="time">0.0</span>s</div>
+    </div>
+    <div class="game-area" id="gameArea"></div>
+    <div class="start-screen" id="startScreen">
+        <h1>🎯 Aim Trainer</h1>
+        <p style="margin-bottom: 30px; font-size: 1.2rem;">Hit 30 targets as fast as you can!</p>
+        <button id="startBtn">Start</button>
+        <div id="finalResult" style="margin-top: 20px; font-size: 2rem;"></div>
+    </div>
+    
+    <script>
+        let score = 0;
+        let startTime;
+        let timerInterval;
+        const gameArea = document.getElementById('gameArea');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const finalResult = document.getElementById('finalResult');
+        
+        function spawnTarget() {
+            const target = document.createElement('div');
+            target.className = 'target';
+            target.style.left = Math.random() * (window.innerWidth - 100) + 50 + 'px';
+            target.style.top = Math.random() * (window.innerHeight - 100) + 50 + 'px';
+            target.addEventListener('click', () => {
+                target.remove();
+                score++;
+                scoreDisplay.textContent = score;
+                if (score >= 30) {
+                    endGame();
+                } else {
+                    spawnTarget();
+                }
+            });
+            gameArea.appendChild(target);
+        }
+        
+        function endGame() {
+            clearInterval(timerInterval);
+            const finalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+            finalResult.textContent = `Time: ${finalTime}s!`;
+            startBtn.textContent = 'Play Again';
+            startScreen.classList.remove('hidden');
+        }
+        
+        startBtn.addEventListener('click', () => {
+            score = 0;
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = '0.0';
+            finalResult.textContent = '';
+            gameArea.innerHTML = '';
+            startScreen.classList.add('hidden');
+            startTime = Date.now();
+            
+            timerInterval = setInterval(() => {
+                timeDisplay.textContent = ((Date.now() - startTime) / 1000).toFixed(1);
+            }, 100);
+            
+            spawnTarget();
+        });
+    </script>
+</body>
+</html>

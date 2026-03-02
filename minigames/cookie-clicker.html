@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            min-height: 100vh;
+            display: flex;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        h1 { font-size: 2rem; margin-bottom: 10px; }
+        .cookie-count {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .per-second { color: rgba(255,255,255,0.7); margin-bottom: 30px; }
+        .cookie {
+            width: 200px;
+            height: 200px;
+            font-size: 150px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cookie:hover { transform: scale(1.05); }
+        .cookie:active { transform: scale(0.95); }
+        .shop {
+            width: 300px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .shop h2 { margin-bottom: 20px; text-align: center; }
+        .item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .item:hover { background: rgba(255,255,255,0.2); }
+        .item.disabled { opacity: 0.5; cursor: not-allowed; }
+        .item-name { font-weight: bold; margin-bottom: 5px; }
+        .item-cost { color: #f1c40f; }
+        .item-owned { color: #2ecc71; float: right; }
+        .item-desc { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+        .float-text {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f1c40f;
+            animation: float 1s ease-out forwards;
+        }
+        @keyframes float {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    
+    <div class="main">
+        <h1>🍪 Cookie Clicker</h1>
+        <div class="cookie-count"><span id="cookies">0</span> cookies</div>
+        <div class="per-second"><span id="cps">0</span> per second</div>
+        <div class="cookie" id="cookie">🍪</div>
+    </div>
+    
+    <div class="shop">
+        <h2>🛒 Shop</h2>
+        <div id="shop"></div>
+    </div>
+    
+    <script>
+        let cookies = 0;
+        let cps = 0;
+        
+        const items = [
+            { name: 'Cursor', baseCost: 15, cps: 0.1, owned: 0, emoji: '👆' },
+            { name: 'Grandma', baseCost: 100, cps: 1, owned: 0, emoji: '👵' },
+            { name: 'Farm', baseCost: 500, cps: 5, owned: 0, emoji: '🌾' },
+            { name: 'Mine', baseCost: 2000, cps: 20, owned: 0, emoji: '⛏️' },
+            { name: 'Factory', baseCost: 10000, cps: 100, owned: 0, emoji: '🏭' },
+            { name: 'Bank', baseCost: 50000, cps: 500, owned: 0, emoji: '🏦' },
+            { name: 'Temple', baseCost: 250000, cps: 2500, owned: 0, emoji: '⛪' },
+            { name: 'Wizard Tower', baseCost: 1000000, cps: 10000, owned: 0, emoji: '🧙' }
+        ];
+        
+        const cookieEl = document.getElementById('cookie');
+        const cookiesDisplay = document.getElementById('cookies');
+        const cpsDisplay = document.getElementById('cps');
+        const shopEl = document.getElementById('shop');
+        
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return Math.floor(num).toString();
+        }
+        
+        function getCost(item) {
+            return Math.floor(item.baseCost * Math.pow(1.15, item.owned));
+        }
+        
+        function updateDisplay() {
+            cookiesDisplay.textContent = formatNumber(cookies);
+            cpsDisplay.textContent = formatNumber(cps);
+            renderShop();
+        }
+        
+        function renderShop() {
+            shopEl.innerHTML = '';
+            items.forEach((item, index) => {
+                const cost = getCost(item);
+                const canAfford = cookies >= cost;
+                
+                const div = document.createElement('div');
+                div.className = 'item' + (canAfford ? '' : ' disabled');
+                div.innerHTML = `
+                    <div class="item-name">${item.emoji} ${item.name} <span class="item-owned">[${item.owned}]</span></div>
+                    <div class="item-cost">Cost: ${formatNumber(cost)}</div>
+                    <div class="item-desc">+${item.cps} CPS each</div>
+                `;
+                
+                if (canAfford) {
+                    div.addEventListener('click', () => buyItem(index));
+                }
+                
+                shopEl.appendChild(div);
+            });
+        }
+        
+        function buyItem(index) {
+            const item = items[index];
+            const cost = getCost(item);
+            
+            if (cookies >= cost) {
+                cookies -= cost;
+                item.owned++;
+                cps += item.cps;
+                updateDisplay();
+            }
+        }
+        
+        function createFloatText(x, y) {
+            const el = document.createElement('div');
+            el.className = 'float-text';
+            el.textContent = '+1';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+        
+        cookieEl.addEventListener('click', (e) => {
+            cookies++;
+            updateDisplay();
+            createFloatText(e.clientX - 10, e.clientY - 20);
+        });
+        
+        // Auto-clicker
+        setInterval(() => {
+            cookies += cps / 10;
+            updateDisplay();
+        }, 100);
+        
+        updateDisplay();
+    </script>
+</body>
+</html>

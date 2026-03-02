@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaction Time</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            z-index: 10;
+        }
+        .waiting { background: #c0392b; }
+        .ready { background: #27ae60; }
+        .result-bg { background: #2980b9; }
+        .early { background: #8e44ad; }
+        h1 { font-size: 3rem; margin-bottom: 20px; text-align: center; }
+        p { font-size: 1.5rem; text-align: center; }
+        .time { font-size: 5rem; margin: 30px 0; }
+    </style>
+</head>
+<body class="waiting">
+    <a href="./" class="back-btn">← Back</a>
+    <h1 id="title">⚡ Reaction Time</h1>
+    <p id="message">Click anywhere to start...</p>
+    <div class="time" id="time"></div>
+    
+    <script>
+        let state = 'idle';
+        let startTime;
+        let timeout;
+        
+        const body = document.body;
+        const title = document.getElementById('title');
+        const message = document.getElementById('message');
+        const timeDisplay = document.getElementById('time');
+        
+        body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('back-btn')) return;
+            
+            if (state === 'idle') {
+                state = 'waiting';
+                body.className = 'waiting';
+                message.textContent = 'Wait for green...';
+                timeDisplay.textContent = '';
+                
+                const delay = Math.random() * 3000 + 2000;
+                timeout = setTimeout(() => {
+                    state = 'ready';
+                    body.className = 'ready';
+                    message.textContent = 'CLICK NOW!';
+                    startTime = Date.now();
+                }, delay);
+            } else if (state === 'waiting') {
+                clearTimeout(timeout);
+                state = 'idle';
+                body.className = 'early';
+                message.textContent = 'Too early! Click to try again.';
+                timeDisplay.textContent = '❌';
+            } else if (state === 'ready') {
+                const reactionTime = Date.now() - startTime;
+                state = 'idle';
+                body.className = 'result-bg';
+                message.textContent = 'Click to try again';
+                timeDisplay.textContent = reactionTime + 'ms';
+            }
+        });
+    </script>
+</body>
+</html>

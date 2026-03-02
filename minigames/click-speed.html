@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Speed Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+        .click-area {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        .click-area:active { transform: scale(0.95); }
+        .result {
+            margin-top: 30px;
+            font-size: 2rem;
+            color: #00ff88;
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #ff0040;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>👆 Click Speed Test</h1>
+    <div class="stats">
+        <div>Clicks: <span id="clicks">0</span></div>
+        <div>Time: <span id="time">10.0</span>s</div>
+    </div>
+    <div class="click-area" id="clickArea">👆</div>
+    <div class="result" id="result"></div>
+    <button id="startBtn">Start Game</button>
+    
+    <script>
+        let clicks = 0;
+        let timeLeft = 10;
+        let gameRunning = false;
+        let interval;
+        
+        const clickArea = document.getElementById('clickArea');
+        const clicksDisplay = document.getElementById('clicks');
+        const timeDisplay = document.getElementById('time');
+        const result = document.getElementById('result');
+        const startBtn = document.getElementById('startBtn');
+        
+        clickArea.addEventListener('click', () => {
+            if (gameRunning) {
+                clicks++;
+                clicksDisplay.textContent = clicks;
+            }
+        });
+        
+        startBtn.addEventListener('click', () => {
+            clicks = 0;
+            timeLeft = 10;
+            gameRunning = true;
+            clicksDisplay.textContent = '0';
+            timeDisplay.textContent = '10.0';
+            result.textContent = '';
+            startBtn.style.display = 'none';
+            
+            interval = setInterval(() => {
+                timeLeft -= 0.1;
+                timeDisplay.textContent = timeLeft.toFixed(1);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    gameRunning = false;
+                    const cps = (clicks / 10).toFixed(1);
+                    result.textContent = `${clicks} clicks! (${cps} CPS)`;
+                    startBtn.style.display = 'block';
+                    startBtn.textContent = 'Play Again';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

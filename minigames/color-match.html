@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Match</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .instructions { color: #888; margin-bottom: 20px; }
+        .stats { font-size: 1.3rem; margin-bottom: 30px; display: flex; gap: 30px; }
+        .word-display {
+            font-size: 5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        .buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+        }
+        .btn.yes { background: #27ae60; }
+        .btn.no { background: #c0392b; }
+        .btn:hover { filter: brightness(1.2); }
+        #message { margin-top: 20px; font-size: 1.5rem; }
+        .start-screen { text-align: center; }
+        .start-screen button {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            background: #9b59b6;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>🎨 Color Match</h1>
+    <p class="instructions">Does the WORD match the COLOR it's displayed in?</p>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Time: <span id="time">30</span>s</div>
+    </div>
+    
+    <div class="word-display" id="word">RED</div>
+    
+    <div class="buttons" id="buttons">
+        <button class="btn yes" id="yesBtn">✓ MATCH</button>
+        <button class="btn no" id="noBtn">✗ NO MATCH</button>
+    </div>
+    
+    <div id="message"></div>
+    
+    <div class="start-screen" id="startScreen">
+        <button id="startBtn">Start Game</button>
+    </div>
+    
+    <script>
+        const colors = [
+            { name: 'RED', hex: '#e74c3c' },
+            { name: 'BLUE', hex: '#3498db' },
+            { name: 'GREEN', hex: '#2ecc71' },
+            { name: 'YELLOW', hex: '#f1c40f' },
+            { name: 'PURPLE', hex: '#9b59b6' },
+            { name: 'ORANGE', hex: '#e67e22' }
+        ];
+        
+        const word = document.getElementById('word');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const message = document.getElementById('message');
+        const startScreen = document.getElementById('startScreen');
+        const startBtn = document.getElementById('startBtn');
+        const buttons = document.getElementById('buttons');
+        
+        let score = 0;
+        let timeLeft = 30;
+        let isMatch = false;
+        let gameRunning = false;
+        let interval;
+        
+        function newRound() {
+            const wordColor = colors[Math.floor(Math.random() * colors.length)];
+            const displayColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            word.textContent = wordColor.name;
+            word.style.color = displayColor.hex;
+            
+            isMatch = wordColor.name === displayColor.name;
+        }
+        
+        function checkAnswer(playerSaidMatch) {
+            if (!gameRunning) return;
+            
+            if (playerSaidMatch === isMatch) {
+                score++;
+                scoreDisplay.textContent = score;
+                message.textContent = '✓';
+                message.style.color = '#2ecc71';
+            } else {
+                message.textContent = '✗';
+                message.style.color = '#e74c3c';
+            }
+            
+            setTimeout(() => {
+                message.textContent = '';
+                newRound();
+            }, 200);
+        }
+        
+        yesBtn.addEventListener('click', () => checkAnswer(true));
+        noBtn.addEventListener('click', () => checkAnswer(false));
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') checkAnswer(true);
+            if (e.key === 'ArrowRight' || e.key === 'd') checkAnswer(false);
+        });
+        
+        startBtn.addEventListener('click', () => {
+            score = 0;
+            timeLeft = 30;
+            gameRunning = true;
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = '30';
+            startScreen.classList.add('hidden');
+            buttons.classList.remove('hidden');
+            word.classList.remove('hidden');
+            
+            newRound();
+            
+            interval = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    gameRunning = false;
+                    clearInterval(interval);
+                    message.textContent = `Game Over! Score: ${score}`;
+                    message.style.color = 'white';
+                    startBtn.textContent = 'Play Again';
+                    startScreen.classList.remove('hidden');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

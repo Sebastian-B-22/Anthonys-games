@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Mole</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #2d5016, #4a7c23);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .stats { font-size: 1.5rem; margin-bottom: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 15px;
+        }
+        .hole {
+            width: 100px;
+            height: 100px;
+            background: #3d2914;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            border: 5px solid #2a1d0d;
+            transition: transform 0.1s;
+        }
+        .hole.active { background: #5a3d1a; }
+        .hole:active { transform: scale(0.9); }
+        button {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #8B4513;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="./" class="back-btn">← Back</a>
+    <h1>🔨 Whack-a-Mole</h1>
+    <div class="stats">
+        Score: <span id="score">0</span> | Time: <span id="time">30</span>s
+    </div>
+    <div class="grid" id="grid"></div>
+    <button id="startBtn">Start Game</button>
+    
+    <script>
+        const grid = document.getElementById('grid');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const startBtn = document.getElementById('startBtn');
+        
+        let score = 0;
+        let timeLeft = 30;
+        let gameRunning = false;
+        let moleTimeout;
+        let timerInterval;
+        let currentMole = null;
+        
+        // Create holes
+        for (let i = 0; i < 9; i++) {
+            const hole = document.createElement('div');
+            hole.className = 'hole';
+            hole.addEventListener('click', () => {
+                if (hole === currentMole && gameRunning) {
+                    score++;
+                    scoreDisplay.textContent = score;
+                    hole.textContent = '';
+                    hole.classList.remove('active');
+                    currentMole = null;
+                    showMole();
+                }
+            });
+            grid.appendChild(hole);
+        }
+        
+        const holes = document.querySelectorAll('.hole');
+        
+        function showMole() {
+            if (!gameRunning) return;
+            
+            if (currentMole) {
+                currentMole.textContent = '';
+                currentMole.classList.remove('active');
+            }
+            
+            const randomIndex = Math.floor(Math.random() * 9);
+            currentMole = holes[randomIndex];
+            currentMole.textContent = '🐿️';
+            currentMole.classList.add('active');
+            
+            moleTimeout = setTimeout(() => {
+                if (currentMole) {
+                    currentMole.textContent = '';
+                    currentMole.classList.remove('active');
+                    currentMole = null;
+                }
+                showMole();
+            }, Math.random() * 800 + 400);
+        }
+        
+        startBtn.addEventListener('click', () => {
+            score = 0;
+            timeLeft = 30;
+            gameRunning = true;
+            scoreDisplay.textContent = '0';
+            timeDisplay.textContent = '30';
+            startBtn.style.display = 'none';
+            
+            showMole();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    gameRunning = false;
+                    clearInterval(timerInterval);
+                    clearTimeout(moleTimeout);
+                    if (currentMole) {
+                        currentMole.textContent = '';
+                        currentMole.classList.remove('active');
+                    }
+                    startBtn.textContent = `Game Over! Score: ${score} - Play Again`;
+                    startBtn.style.display = 'block';
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
