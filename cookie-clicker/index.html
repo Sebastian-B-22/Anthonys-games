@@ -6,6 +6,12 @@
     <title>Cookie Clicker - Guinea Pig Edition!</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #ffffff;
@@ -177,6 +183,8 @@
             flex: 1;
             overflow-y: auto;
             padding-right: 5px;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
         }
         .shop-scroll::-webkit-scrollbar {
             width: 8px;
@@ -420,7 +428,13 @@
         
         // Render upgrades
         function renderUpgrades() {
-            upgradeList.innerHTML = '<div style="color:#ffd700;margin-bottom:10px;font-weight:bold;">🥕 Auto Treats</div>';
+            upgradeList.innerHTML = '';
+            
+            // Auto Treats header
+            const autoHeader = document.createElement('div');
+            autoHeader.style.cssText = 'color:#ffd700;margin-bottom:10px;font-weight:bold;';
+            autoHeader.textContent = '🥕 Auto Treats';
+            upgradeList.appendChild(autoHeader);
             
             upgrades.forEach((up, i) => {
                 const cost = Math.floor(up.baseCost * Math.pow(1.15, up.owned));
@@ -443,7 +457,11 @@
                 upgradeList.appendChild(div);
             });
             
-            upgradeList.innerHTML += '<div style="color:#ffd700;margin:15px 0 10px;font-weight:bold;">🐾 Click Power</div>';
+            // Click Power header
+            const clickHeader = document.createElement('div');
+            clickHeader.style.cssText = 'color:#ffd700;margin:15px 0 10px;font-weight:bold;';
+            clickHeader.textContent = '🐾 Click Power';
+            upgradeList.appendChild(clickHeader);
             
             clickUpgrades.forEach((up, i) => {
                 const cost = Math.floor(up.baseCost * Math.pow(1.5, up.owned));
