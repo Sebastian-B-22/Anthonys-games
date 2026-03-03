@@ -311,6 +311,15 @@
             font-size: 0.8rem;
             font-weight: bold;
         }
+        .move-cost {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #4ecdc4;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-right: 5px;
+        }
         .move-dmg {
             font-size: 0.9rem;
             font-weight: bold;
@@ -318,6 +327,28 @@
             background: rgba(0,0,0,0.3);
             padding: 2px 8px;
             border-radius: 10px;
+        }
+        .special-move .move {
+            background: linear-gradient(90deg, rgba(255,215,0,0.3), rgba(255,100,0,0.3));
+            border: 1px solid #ffd700;
+        }
+        .special-move .move-name {
+            color: #ffd700;
+        }
+        .energy-card-info {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .energy-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+        .energy-type-label {
+            font-size: 0.9rem;
+            color: #aaa;
         }
         
         /* Generated prompt display */
@@ -410,8 +441,22 @@
     <div class="container">
         <div class="form-section">
             <div class="form-group">
+                <label>Card Type</label>
+                <select id="cardCategory">
+                    <option value="character">🧙 Character Card</option>
+                    <option value="energy">⚡ Energy Card</option>
+                    <option value="special">🌟 SPECIAL Card</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label>Card Name</label>
                 <input type="text" id="cardName" placeholder="Enter card name..." value="Shadow Dragon">
+            </div>
+            
+            <div class="form-group" id="energyNameGroup">
+                <label>Energy/Mana Name</label>
+                <input type="text" id="energyName" placeholder="Energy, Mana, Power..." value="Energy">
             </div>
             
             <div class="form-group">
@@ -441,18 +486,40 @@
                 </select>
             </div>
             
-            <div class="form-group">
-                <label>⚡ Move 1</label>
-                <div class="move-row">
-                    <input type="text" id="move1Name" placeholder="Move name..." value="Thunder Strike">
-                    <input type="number" id="move1Dmg" placeholder="DMG" value="40" min="0" max="999" style="width: 70px;">
+            <div id="movesSection">
+                <div class="form-group">
+                    <label>⚡ Move 1</label>
+                    <div class="move-row">
+                        <input type="number" id="move1Cost" placeholder="⚡" value="1" min="0" max="99" style="width: 50px;" title="Energy Cost">
+                        <input type="text" id="move1Name" placeholder="Move name..." value="Thunder Strike">
+                        <input type="number" id="move1Dmg" placeholder="DMG" value="40" min="0" max="999" style="width: 70px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>🔥 Move 2</label>
+                    <div class="move-row">
+                        <input type="number" id="move2Cost" placeholder="⚡" value="2" min="0" max="99" style="width: 50px;" title="Energy Cost">
+                        <input type="text" id="move2Name" placeholder="Move name..." value="Volt Surge">
+                        <input type="number" id="move2Dmg" placeholder="DMG" value="80" min="0" max="999" style="width: 70px;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>💥 Move 3</label>
+                    <div class="move-row">
+                        <input type="number" id="move3Cost" placeholder="⚡" value="4" min="0" max="99" style="width: 50px;" title="Energy Cost">
+                        <input type="text" id="move3Name" placeholder="Move name..." value="Ultimate Blast">
+                        <input type="number" id="move3Dmg" placeholder="DMG" value="150" min="0" max="999" style="width: 70px;">
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label>🔥 Move 2</label>
-                <div class="move-row">
-                    <input type="text" id="move2Name" placeholder="Move name..." value="Volt Surge">
-                    <input type="number" id="move2Dmg" placeholder="DMG" value="80" min="0" max="999" style="width: 70px;">
+            <div id="specialMoveSection" style="display: none;">
+                <div class="form-group">
+                    <label>🌟 SPECIAL MOVE</label>
+                    <div class="move-row">
+                        <input type="number" id="specialCost" placeholder="⚡" value="6" min="0" max="99" style="width: 50px;" title="Energy Cost">
+                        <input type="text" id="specialName" placeholder="Special move name..." value="LEGENDARY FINISHER">
+                        <input type="number" id="specialDmg" placeholder="DMG" value="300" min="0" max="999" style="width: 70px;">
+                    </div>
                 </div>
             </div>
             
@@ -506,15 +573,33 @@
                         <span class="rarity-stars">★★★★★</span>
                     </div>
                     <div class="card-desc" id="previewDesc">A fearsome dragon born from the darkest shadows. Its eyes gleam with ancient power.</div>
-                    <div class="card-moves">
+                    <div class="card-moves" id="cardMovesSection">
                         <div class="move" id="previewMove1">
+                            <span class="move-cost">1⚡</span>
                             <span class="move-name">Thunder Strike</span>
                             <span class="move-dmg">40</span>
                         </div>
                         <div class="move" id="previewMove2">
+                            <span class="move-cost">2⚡</span>
                             <span class="move-name">Volt Surge</span>
                             <span class="move-dmg">80</span>
                         </div>
+                        <div class="move" id="previewMove3">
+                            <span class="move-cost">4⚡</span>
+                            <span class="move-name">Ultimate Blast</span>
+                            <span class="move-dmg">150</span>
+                        </div>
+                    </div>
+                    <div class="special-move" id="previewSpecial" style="display: none;">
+                        <div class="move special">
+                            <span class="move-cost">6⚡</span>
+                            <span class="move-name">LEGENDARY FINISHER</span>
+                            <span class="move-dmg">300</span>
+                        </div>
+                    </div>
+                    <div class="energy-card-info" id="energyCardInfo" style="display: none;">
+                        <div class="energy-amount">+3</div>
+                        <div class="energy-type-label">Energy</div>
                     </div>
                 </div>
             </div>
@@ -539,19 +624,63 @@
         
         // Update preview in real-time
         function updatePreview() {
+            const cardCategory = document.getElementById('cardCategory').value;
             const name = document.getElementById('cardName').value || 'Unnamed';
             const type = document.getElementById('cardType').value;
             const rarity = document.getElementById('cardRarity').value;
+            const energyName = document.getElementById('energyName').value || '⚡';
+            const energySymbol = energyName.charAt(0);
+            
             const move1Name = document.getElementById('move1Name').value || 'Move 1';
             const move1Dmg = document.getElementById('move1Dmg').value || '0';
+            const move1Cost = document.getElementById('move1Cost').value || '0';
             const move2Name = document.getElementById('move2Name').value || 'Move 2';
             const move2Dmg = document.getElementById('move2Dmg').value || '0';
+            const move2Cost = document.getElementById('move2Cost').value || '0';
+            const move3Name = document.getElementById('move3Name').value || 'Move 3';
+            const move3Dmg = document.getElementById('move3Dmg').value || '0';
+            const move3Cost = document.getElementById('move3Cost').value || '0';
+            const specialName = document.getElementById('specialName').value || 'SPECIAL';
+            const specialDmg = document.getElementById('specialDmg').value || '0';
+            const specialCost = document.getElementById('specialCost').value || '0';
             const desc = document.getElementById('cardDesc').value || 'No description';
             
             document.getElementById('previewName').textContent = name;
             document.getElementById('previewTypeIcon').textContent = typeIcons[type];
-            document.getElementById('previewMove1').innerHTML = `<span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
-            document.getElementById('previewMove2').innerHTML = `<span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
+            
+            // Update moves
+            document.getElementById('previewMove1').innerHTML = `<span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
+            document.getElementById('previewMove2').innerHTML = `<span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
+            document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+            
+            // Handle card categories
+            const movesSection = document.getElementById('cardMovesSection');
+            const specialSection = document.getElementById('previewSpecial');
+            const energyInfo = document.getElementById('energyCardInfo');
+            const descSection = document.getElementById('previewDesc');
+            
+            if (cardCategory === 'energy') {
+                movesSection.style.display = 'none';
+                specialSection.style.display = 'none';
+                energyInfo.style.display = 'block';
+                energyInfo.innerHTML = `<div class="energy-amount">+3</div><div class="energy-type-label">${energyName}</div>`;
+                document.getElementById('movesSection').style.display = 'none';
+                document.getElementById('specialMoveSection').style.display = 'none';
+            } else if (cardCategory === 'special') {
+                movesSection.style.display = 'block';
+                specialSection.style.display = 'block';
+                energyInfo.style.display = 'none';
+                specialSection.innerHTML = `<div class="move special"><span class="move-cost">${specialCost}${energySymbol}</span><span class="move-name">${specialName}</span><span class="move-dmg">${specialDmg}</span></div>`;
+                document.getElementById('movesSection').style.display = 'block';
+                document.getElementById('specialMoveSection').style.display = 'block';
+            } else {
+                movesSection.style.display = 'block';
+                specialSection.style.display = 'none';
+                energyInfo.style.display = 'none';
+                document.getElementById('movesSection').style.display = 'block';
+                document.getElementById('specialMoveSection').style.display = 'none';
+            }
+            
             document.getElementById('previewDesc').textContent = desc;
             
             // Update card background
