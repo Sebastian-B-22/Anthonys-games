@@ -285,9 +285,10 @@
             background: rgba(255,255,255,0.1);
             border-radius: 5px;
             padding: 8px;
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             margin-bottom: 8px;
-            min-height: 45px;
+            min-height: 40px;
+            line-height: 1.3;
         }
         
         .card-moves {
@@ -457,6 +458,11 @@
             <div class="form-group" id="energyNameGroup">
                 <label>Energy/Mana Name</label>
                 <input type="text" id="energyName" placeholder="Energy, Mana, Power..." value="Energy">
+            </div>
+            
+            <div class="form-group" id="energyAmountGroup" style="display: none;">
+                <label>Energy Amount</label>
+                <input type="number" id="energyAmount" placeholder="+3" value="3" min="1" max="99">
             </div>
             
             <div class="form-group">
@@ -659,14 +665,21 @@
             const energyInfo = document.getElementById('energyCardInfo');
             const descSection = document.getElementById('previewDesc');
             
+            const cardImage = document.getElementById('previewImage');
+            const energyAmountVal = document.getElementById('energyAmount').value || '3';
+            
             if (cardCategory === 'energy') {
                 movesSection.style.display = 'none';
                 specialSection.style.display = 'none';
                 energyInfo.style.display = 'block';
-                energyInfo.innerHTML = `<div class="energy-amount">+3</div><div class="energy-type-label">${energyName}</div>`;
+                cardImage.style.display = 'none';
+                energyInfo.innerHTML = `<div class="energy-amount">+${energyAmountVal}</div><div class="energy-type-label">${energyName}</div>`;
                 document.getElementById('movesSection').style.display = 'none';
                 document.getElementById('specialMoveSection').style.display = 'none';
+                document.getElementById('energyAmountGroup').style.display = 'block';
             } else if (cardCategory === 'special') {
+                cardImage.style.display = 'flex';
+                document.getElementById('energyAmountGroup').style.display = 'none';
                 movesSection.style.display = 'block';
                 specialSection.style.display = 'block';
                 energyInfo.style.display = 'none';
@@ -677,8 +690,10 @@
                 movesSection.style.display = 'block';
                 specialSection.style.display = 'none';
                 energyInfo.style.display = 'none';
+                cardImage.style.display = 'flex';
                 document.getElementById('movesSection').style.display = 'block';
                 document.getElementById('specialMoveSection').style.display = 'none';
+                document.getElementById('energyAmountGroup').style.display = 'none';
             }
             
             document.getElementById('previewDesc').textContent = desc;
