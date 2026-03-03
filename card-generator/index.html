@@ -334,9 +334,9 @@
             <button class="generate-btn" onclick="generateCard()">✨ Generate Card Art!</button>
             
             <div class="prompt-display" id="promptDisplay">
-                <h3>📋 Your Card Request</h3>
+                <h3>📋 Prompt for ChatGPT</h3>
                 <p id="generatedPrompt"></p>
-                <p class="hint">👆 Send this to Compass in Telegram and I'll generate the art for you!</p>
+                <p class="hint">👆 Copy this and paste it into ChatGPT to generate your card art!</p>
                 <button class="copy-btn" onclick="copyPrompt()">📋 Copy to Clipboard</button>
             </div>
         </div>
@@ -428,15 +428,13 @@
             const rarity = document.getElementById('cardRarity').value;
             const artStyle = document.getElementById('artStyle').value || 'fantasy art style';
             
-            const prompt = `🎴 CARD ART REQUEST
+            const prompt = `Generate trading card art for a card called "${name}". 
 
-Name: ${name}
-Type: ${type.charAt(0).toUpperCase() + type.slice(1)} ${typeIcons[type]}
-Rarity: ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+It's a ${rarity} ${type} type card.
 
-Art Style: ${artStyle}
+Art style: ${artStyle}
 
-Please generate trading card art for this!`;
+Make it vertical/portrait orientation like a trading card. Don't include any text on the image - just the artwork.`;
             
             document.getElementById('generatedPrompt').textContent = prompt;
             document.getElementById('promptDisplay').classList.add('active');
