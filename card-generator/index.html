@@ -321,6 +321,24 @@
         .move-name {
             font-size: 0.8rem;
             font-weight: bold;
+            flex: 1;
+        }
+        .move-desc-text {
+            font-size: 0.6rem;
+            color: #aaa;
+            font-style: italic;
+            margin-top: 2px;
+            display: block;
+        }
+        .move.with-desc {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .move.with-desc .move-header {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
         }
         .move-cost {
             font-size: 0.7rem;
@@ -488,7 +506,19 @@
             
             <div class="form-group" id="hpGroup">
                 <label>❤️ HP (Health)</label>
-                <input type="number" id="cardHp" placeholder="100" value="100" min="1" max="9999">
+                <div class="move-row">
+                    <input type="text" id="hpIcon" placeholder="Icon" value="❤️" maxlength="2" style="width: 50px;">
+                    <input type="number" id="cardHp" placeholder="100" value="100" min="1" max="9999">
+                    <input type="color" id="hpColor" value="#ff6b6b" title="HP Color" style="width: 50px; height: 38px; padding: 2px;">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>📝 Move Descriptions</label>
+                <select id="moveDescMode">
+                    <option value="none">No descriptions (3 moves)</option>
+                    <option value="desc">With descriptions (2 moves)</option>
+                </select>
             </div>
             
             <div class="form-group" id="energyAmountGroup" style="display: none;">
@@ -531,6 +561,7 @@
                         <input type="text" id="move1Name" placeholder="Move name..." value="Thunder Strike">
                         <input type="number" id="move1Dmg" placeholder="DMG" value="40" min="0" max="999" style="width: 70px;">
                     </div>
+                    <input type="text" id="move1Desc" class="move-desc-input" placeholder="Move description (optional)..." style="display:none; margin-top:5px;">
                 </div>
                 <div class="form-group">
                     <label>🔥 Move 2</label>
@@ -539,8 +570,9 @@
                         <input type="text" id="move2Name" placeholder="Move name..." value="Volt Surge">
                         <input type="number" id="move2Dmg" placeholder="DMG" value="80" min="0" max="999" style="width: 70px;">
                     </div>
+                    <input type="text" id="move2Desc" class="move-desc-input" placeholder="Move description (optional)..." style="display:none; margin-top:5px;">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="move3Group">
                     <label>💥 Move 3</label>
                     <div class="move-row">
                         <input type="number" id="move3Cost" placeholder="⚡" value="4" min="0" max="99" style="width: 50px;" title="Energy Cost">
@@ -669,6 +701,11 @@
             const energyName = document.getElementById('energyName').value || 'Energy';
             const energySymbol = document.getElementById('energySymbol').value || '⚡';
             const hp = document.getElementById('cardHp').value || '100';
+            const hpIcon = document.getElementById('hpIcon').value || '❤️';
+            const hpColor = document.getElementById('hpColor').value || '#ff6b6b';
+            const moveDescMode = document.getElementById('moveDescMode').value;
+            const move1Desc = document.getElementById('move1Desc').value || '';
+            const move2Desc = document.getElementById('move2Desc').value || '';
             
             const move1Name = document.getElementById('move1Name').value || 'Move 1';
             const move1Dmg = document.getElementById('move1Dmg').value || '0';
@@ -686,12 +723,37 @@
             
             document.getElementById('previewName').textContent = name;
             document.getElementById('previewTypeIcon').textContent = typeIcons[type];
-            document.getElementById('previewHp').textContent = '❤️ ' + hp;
+            const hpEl = document.getElementById('previewHp');
+            hpEl.textContent = hpIcon + ' ' + hp;
+            hpEl.style.color = hpColor;
             
-            // Update moves
-            document.getElementById('previewMove1').innerHTML = `<span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
-            document.getElementById('previewMove2').innerHTML = `<span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
-            document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+            // Handle move description mode
+            const descInputs = document.querySelectorAll('.move-desc-input');
+            const move3Group = document.getElementById('move3Group');
+            const previewMove3 = document.getElementById('previewMove3');
+            
+            if (moveDescMode === 'desc') {
+                descInputs.forEach(input => input.style.display = 'block');
+                move3Group.style.display = 'none';
+                previewMove3.style.display = 'none';
+                
+                // Update moves with descriptions
+                document.getElementById('previewMove1').innerHTML = `<div class="move-header"><span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span></div>${move1Desc ? '<span class="move-desc-text">' + move1Desc + '</span>' : ''}`;
+                document.getElementById('previewMove1').className = move1Desc ? 'move with-desc' : 'move';
+                document.getElementById('previewMove2').innerHTML = `<div class="move-header"><span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span></div>${move2Desc ? '<span class="move-desc-text">' + move2Desc + '</span>' : ''}`;
+                document.getElementById('previewMove2').className = move2Desc ? 'move with-desc' : 'move';
+            } else {
+                descInputs.forEach(input => input.style.display = 'none');
+                move3Group.style.display = 'block';
+                previewMove3.style.display = 'flex';
+                
+                // Update moves without descriptions
+                document.getElementById('previewMove1').innerHTML = `<span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
+                document.getElementById('previewMove1').className = 'move';
+                document.getElementById('previewMove2').innerHTML = `<span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
+                document.getElementById('previewMove2').className = 'move';
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+            }
             
             // Handle card categories
             const movesSection = document.getElementById('cardMovesSection');
