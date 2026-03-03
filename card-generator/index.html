@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trading Card Generator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            z-index: 100;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0 30px;
+            font-size: 2rem;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+        .container {
+            display: flex;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        /* Form side */
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #aaa;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+        .stat-row {
+            display: flex;
+            gap: 15px;
+        }
+        .stat-row .form-group {
+            flex: 1;
+        }
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .generate-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Card preview side */
+        .preview-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .preview-label {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        /* The Card */
+        .card {
+            width: 300px;
+            height: 420px;
+            border-radius: 15px;
+            padding: 12px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+        .card:hover {
+            transform: rotateY(5deg) rotateX(5deg);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        
+        /* Card types */
+        .card.fire { background: linear-gradient(135deg, #ff4444, #ff8800, #ffaa00); }
+        .card.water { background: linear-gradient(135deg, #0077be, #00aaff, #00ddff); }
+        .card.earth { background: linear-gradient(135deg, #8B4513, #654321, #3d2914); }
+        .card.air { background: linear-gradient(135deg, #87CEEB, #b0e0e6, #f0f8ff); }
+        .card.electric { background: linear-gradient(135deg, #ffd700, #ffff00, #fffacd); }
+        .card.shadow { background: linear-gradient(135deg, #2d1b4e, #1a0a2e, #0d0015); }
+        .card.light { background: linear-gradient(135deg, #fff8dc, #fffacd, #ffffff); }
+        .card.nature { background: linear-gradient(135deg, #228B22, #32CD32, #90EE90); }
+        
+        .card-inner {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            height: 100%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+        }
+        .card-type-icon {
+            font-size: 1.3rem;
+        }
+        
+        .card-image {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .card-image .placeholder {
+            color: #555;
+            font-size: 1rem;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .card-rarity {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .rarity-stars {
+            color: #ffd700;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #ffd700;
+        }
+        .rarity-common .rarity-stars { color: #888; text-shadow: none; }
+        .rarity-uncommon .rarity-stars { color: #4CAF50; text-shadow: 0 0 5px #4CAF50; }
+        .rarity-rare .rarity-stars { color: #2196F3; text-shadow: 0 0 5px #2196F3; }
+        .rarity-epic .rarity-stars { color: #9C27B0; text-shadow: 0 0 5px #9C27B0; }
+        .rarity-legendary .rarity-stars { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
+        
+        .card-desc {
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            min-height: 45px;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+            padding: 8px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.65rem;
+            color: #aaa;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .stat-atk .stat-value { color: #ff6b6b; }
+        .stat-def .stat-value { color: #4ecdc4; }
+        .stat-spd .stat-value { color: #ffe66d; }
+        
+        /* Generated prompt display */
+        .prompt-display {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+        }
+        .prompt-display.active { display: block; }
+        .prompt-display h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        .prompt-display p {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .prompt-display .hint {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .copy-btn {
+            background: #4CAF50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .copy-btn:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-btn">← Back</a>
+    
+    <h1>🎴 Trading Card Generator</h1>
+    
+    <div class="container">
+        <div class="form-section">
+            <div class="form-group">
+                <label>Card Name</label>
+                <input type="text" id="cardName" placeholder="Enter card name..." value="Shadow Dragon">
+            </div>
+            
+            <div class="form-group">
+                <label>Element Type</label>
+                <select id="cardType">
+                    <option value="fire">🔥 Fire</option>
+                    <option value="water">💧 Water</option>
+                    <option value="earth">🪨 Earth</option>
+                    <option value="air">💨 Air</option>
+                    <option value="electric">⚡ Electric</option>
+                    <option value="shadow" selected>🌑 Shadow</option>
+                    <option value="light">✨ Light</option>
+                    <option value="nature">🌿 Nature</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Rarity</label>
+                <select id="cardRarity">
+                    <option value="common">Common ★</option>
+                    <option value="uncommon">Uncommon ★★</option>
+                    <option value="rare">Rare ★★★</option>
+                    <option value="epic">Epic ★★★★</option>
+                    <option value="legendary" selected>Legendary ★★★★★</option>
+                </select>
+            </div>
+            
+            <div class="stat-row">
+                <div class="form-group">
+                    <label>⚔️ Attack</label>
+                    <input type="number" id="cardAtk" value="850" min="0" max="9999">
+                </div>
+                <div class="form-group">
+                    <label>🛡️ Defense</label>
+                    <input type="number" id="cardDef" value="600" min="0" max="9999">
+                </div>
+                <div class="form-group">
+                    <label>💨 Speed</label>
+                    <input type="number" id="cardSpd" value="400" min="0" max="9999">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="cardDesc" placeholder="Card description/lore...">A fearsome dragon born from the darkest shadows. Its eyes gleam with ancient power.</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>🎨 Art Style (for AI generation)</label>
+                <textarea id="artStyle" placeholder="Describe the art style you want...">epic fantasy art, dark and dramatic lighting, detailed scales, glowing purple eyes, manga style</textarea>
+            </div>
+            
+            <button class="generate-btn" onclick="generateCard()">✨ Generate Card Art!</button>
+            
+            <div class="prompt-display" id="promptDisplay">
+                <h3>📋 Your Card Request</h3>
+                <p id="generatedPrompt"></p>
+                <p class="hint">👆 Send this to Compass in Telegram and I'll generate the art for you!</p>
+                <button class="copy-btn" onclick="copyPrompt()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="preview-label">Live Preview</div>
+            <div class="card shadow" id="cardPreview">
+                <div class="card-inner">
+                    <div class="card-header">
+                        <span class="card-name" id="previewName">Shadow Dragon</span>
+                        <span class="card-type-icon" id="previewTypeIcon">🌑</span>
+                    </div>
+                    <div class="card-image" id="previewImage">
+                        <div class="placeholder">🎨<br>Art will appear here!</div>
+                    </div>
+                    <div class="card-rarity rarity-legendary" id="previewRarity">
+                        <span class="rarity-stars">★★★★★</span>
+                    </div>
+                    <div class="card-desc" id="previewDesc">A fearsome dragon born from the darkest shadows. Its eyes gleam with ancient power.</div>
+                    <div class="card-stats">
+                        <div class="stat stat-atk">
+                            <div class="stat-label">ATK</div>
+                            <div class="stat-value" id="previewAtk">850</div>
+                        </div>
+                        <div class="stat stat-def">
+                            <div class="stat-label">DEF</div>
+                            <div class="stat-value" id="previewDef">600</div>
+                        </div>
+                        <div class="stat stat-spd">
+                            <div class="stat-label">SPD</div>
+                            <div class="stat-value" id="previewSpd">400</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const typeIcons = {
+            fire: '🔥', water: '💧', earth: '🪨', air: '💨',
+            electric: '⚡', shadow: '🌑', light: '✨', nature: '🌿'
+        };
+        
+        const rarityStars = {
+            common: '★',
+            uncommon: '★★',
+            rare: '★★★',
+            epic: '★★★★',
+            legendary: '★★★★★'
+        };
+        
+        // Update preview in real-time
+        function updatePreview() {
+            const name = document.getElementById('cardName').value || 'Unnamed';
+            const type = document.getElementById('cardType').value;
+            const rarity = document.getElementById('cardRarity').value;
+            const atk = document.getElementById('cardAtk').value || '0';
+            const def = document.getElementById('cardDef').value || '0';
+            const spd = document.getElementById('cardSpd').value || '0';
+            const desc = document.getElementById('cardDesc').value || 'No description';
+            
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewTypeIcon').textContent = typeIcons[type];
+            document.getElementById('previewAtk').textContent = atk;
+            document.getElementById('previewDef').textContent = def;
+            document.getElementById('previewSpd').textContent = spd;
+            document.getElementById('previewDesc').textContent = desc;
+            
+            // Update card background
+            const card = document.getElementById('cardPreview');
+            card.className = 'card ' + type;
+            
+            // Update rarity
+            const rarityEl = document.getElementById('previewRarity');
+            rarityEl.className = 'card-rarity rarity-' + rarity;
+            rarityEl.querySelector('.rarity-stars').textContent = rarityStars[rarity];
+        }
+        
+        // Add listeners to all inputs
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('input', updatePreview);
+        });
+        
+        // Generate card request
+        function generateCard() {
+            const name = document.getElementById('cardName').value || 'Unnamed Card';
+            const type = document.getElementById('cardType').value;
+            const rarity = document.getElementById('cardRarity').value;
+            const artStyle = document.getElementById('artStyle').value || 'fantasy art style';
+            
+            const prompt = `🎴 CARD ART REQUEST
+
+Name: ${name}
+Type: ${type.charAt(0).toUpperCase() + type.slice(1)} ${typeIcons[type]}
+Rarity: ${rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+
+Art Style: ${artStyle}
+
+Please generate trading card art for this!`;
+            
+            document.getElementById('generatedPrompt').textContent = prompt;
+            document.getElementById('promptDisplay').classList.add('active');
+        }
+        
+        // Copy prompt
+        function copyPrompt() {
+            const prompt = document.getElementById('generatedPrompt').textContent;
+            navigator.clipboard.writeText(prompt).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => { btn.textContent = '📋 Copy to Clipboard'; }, 2000);
+            });
+        }
+        
+        // Initial update
+        updatePreview();
+    </script>
+</body>
+</html>
