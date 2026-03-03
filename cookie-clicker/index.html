@@ -155,16 +155,38 @@
         /* Shop */
         .shop {
             width: 280px;
+            height: 100vh;
             background: linear-gradient(180deg, #8B4513, #654321);
             padding: 15px;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
             color: white;
         }
         .shop h2 {
+            flex-shrink: 0;
+        }
+        .shop-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .shop-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .shop-scroll::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .shop-scroll::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 4px;
+        }
+        .shop > h2 {
             text-align: center;
             margin-bottom: 10px;
             color: #ffd700;
             font-size: 1.1rem;
+            flex-shrink: 0;
         }
         
         .upgrade {
@@ -279,14 +301,16 @@
     
     <div class="shop">
         <h2>🛒 Upgrades</h2>
-        <div id="upgradeList"></div>
-        
-        <div class="stats-panel">
-            <h3>📊 Stats</h3>
-            <div class="stat-row"><span>Total Clicks:</span><span id="totalClicks">0</span></div>
-            <div class="stat-row"><span>Treats per Click:</span><span id="treatsPerClick">1</span></div>
-            <div class="stat-row"><span>Villains Defeated:</span><span id="villainsDefeated">0</span></div>
-            <div class="stat-row"><span>Treats Stolen:</span><span id="treatsStolen">0</span></div>
+        <div class="shop-scroll">
+            <div id="upgradeList"></div>
+            
+            <div class="stats-panel">
+                <h3>📊 Stats</h3>
+                <div class="stat-row"><span>Total Clicks:</span><span id="totalClicks">0</span></div>
+                <div class="stat-row"><span>Treats per Click:</span><span id="treatsPerClick">1</span></div>
+                <div class="stat-row"><span>Villains Defeated:</span><span id="villainsDefeated">0</span></div>
+                <div class="stat-row"><span>Treats Stolen:</span><span id="treatsStolen">0</span></div>
+            </div>
         </div>
     </div>
     
@@ -341,15 +365,15 @@
             { name: '👑 Royal Treatment', desc: 'Cookie feels like a king', clickBonus: 100, baseCost: 50000, owned: 0, max: 5 }
         ];
         
-        // Villains (MUCH more HP - need lots of clicks!)
+        // Villains (balanced HP - challenging but beatable!)
         const villains = [
-            { emoji: '🦊', name: 'Sneaky Fox', hp: 50, stealRate: 1, message: 'A fox wants Cookie\'s treats!' },
-            { emoji: '🐱', name: 'Hungry Cat', hp: 80, stealRate: 2, message: 'A cat is eyeing Cookie nervously!' },
-            { emoji: '🦅', name: 'Swooping Hawk', hp: 120, stealRate: 3, message: 'A hawk circles above!' },
-            { emoji: '🐍', name: 'Slithering Snake', hp: 180, stealRate: 5, message: 'A snake approaches Cookie!' },
-            { emoji: '🦝', name: 'Raccoon Thief', hp: 250, stealRate: 8, message: 'A raccoon wants to steal everything!' },
-            { emoji: '🐺', name: 'Big Bad Wolf', hp: 400, stealRate: 12, message: 'THE WOLF IS HERE! PROTECT COOKIE!' },
-            { emoji: '🐲', name: 'TREAT DRAGON', hp: 750, stealRate: 20, message: '🔥 A DRAGON ATTACKS! 🔥' }
+            { emoji: '🦊', name: 'Sneaky Fox', hp: 15, stealRate: 1, message: 'A fox wants Cookie\'s treats!' },
+            { emoji: '🐱', name: 'Hungry Cat', hp: 25, stealRate: 2, message: 'A cat is eyeing Cookie nervously!' },
+            { emoji: '🦅', name: 'Swooping Hawk', hp: 35, stealRate: 3, message: 'A hawk circles above!' },
+            { emoji: '🐍', name: 'Slithering Snake', hp: 50, stealRate: 5, message: 'A snake approaches Cookie!' },
+            { emoji: '🦝', name: 'Raccoon Thief', hp: 75, stealRate: 8, message: 'A raccoon wants to steal everything!' },
+            { emoji: '🐺', name: 'Big Bad Wolf', hp: 120, stealRate: 12, message: 'THE WOLF IS HERE! PROTECT COOKIE!' },
+            { emoji: '🐲', name: 'TREAT DRAGON', hp: 200, stealRate: 20, message: '🔥 A DRAGON ATTACKS! 🔥' }
         ];
         
         // DOM Elements
