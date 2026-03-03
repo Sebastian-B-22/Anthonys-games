@@ -239,6 +239,26 @@
         .rarity-rare .rarity-stars { color: #2196F3; text-shadow: 0 0 5px #2196F3; }
         .rarity-epic .rarity-stars { color: #9C27B0; text-shadow: 0 0 5px #9C27B0; }
         .rarity-legendary .rarity-stars { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
+        .rarity-godly .rarity-stars { 
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
+            animation: godlyGlow 1s ease-in-out infinite alternate;
+            font-size: 1.1rem;
+        }
+        @keyframes godlyGlow {
+            0% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+            100% { text-shadow: 0 0 20px #00ffff, 0 0 30px #ff00ff, 0 0 40px #fff; }
+        }
+        .card.godly {
+            background: linear-gradient(135deg, #ff00ff, #00ffff, #ff00ff, #ffff00, #ff00ff);
+            background-size: 400% 400%;
+            animation: godlyCard 3s ease infinite;
+        }
+        @keyframes godlyCard {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         .rarity-secret .rarity-stars { 
             color: #000;
             text-shadow: 
@@ -424,6 +444,7 @@
                     <option value="rare">Rare ★★★</option>
                     <option value="epic">Epic ★★★★</option>
                     <option value="legendary" selected>Legendary ★★★★★</option>
+                    <option value="godly">✦ GODLY ✦</option>
                     <option value="secret">??? SECRET ???</option>
                 </select>
             </div>
@@ -519,6 +540,7 @@
             rare: '★★★',
             epic: '★★★★',
             legendary: '★★★★★',
+            godly: '✦✦✦✦✦✦',
             secret: '★☆★☆★☆★'
         };
         
@@ -543,6 +565,8 @@
             const card = document.getElementById('cardPreview');
             if (rarity === 'secret') {
                 card.className = 'card secret';
+            } else if (rarity === 'godly') {
+                card.className = 'card godly';
             } else {
                 card.className = 'card ' + type;
             }
