@@ -193,9 +193,19 @@
             margin-bottom: 8px;
         }
         .card-name {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             text-shadow: 1px 1px 2px #000;
+            flex: 1;
+        }
+        .card-hp {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin: 0 8px;
         }
         .card-type-icon {
             font-size: 1.3rem;
@@ -460,6 +470,16 @@
                 <input type="text" id="energyName" placeholder="Energy, Mana, Power..." value="Energy">
             </div>
             
+            <div class="form-group" id="energySymbolGroup">
+                <label>Energy Symbol (for moves)</label>
+                <input type="text" id="energySymbol" placeholder="⚡, 🔮, M..." value="⚡" maxlength="3">
+            </div>
+            
+            <div class="form-group" id="hpGroup">
+                <label>❤️ HP (Health)</label>
+                <input type="number" id="cardHp" placeholder="100" value="100" min="1" max="9999">
+            </div>
+            
             <div class="form-group" id="energyAmountGroup" style="display: none;">
                 <label>Energy Amount</label>
                 <input type="number" id="energyAmount" placeholder="+3" value="3" min="1" max="99">
@@ -569,6 +589,7 @@
                 <div class="card-inner">
                     <div class="card-header">
                         <span class="card-name" id="previewName">Shadow Dragon</span>
+                        <span class="card-hp" id="previewHp">❤️ 100</span>
                         <span class="card-type-icon" id="previewTypeIcon">🌑</span>
                     </div>
                     <div class="card-image" id="previewImage">
@@ -634,8 +655,9 @@
             const name = document.getElementById('cardName').value || 'Unnamed';
             const type = document.getElementById('cardType').value;
             const rarity = document.getElementById('cardRarity').value;
-            const energyName = document.getElementById('energyName').value || '⚡';
-            const energySymbol = energyName.charAt(0);
+            const energyName = document.getElementById('energyName').value || 'Energy';
+            const energySymbol = document.getElementById('energySymbol').value || '⚡';
+            const hp = document.getElementById('cardHp').value || '100';
             
             const move1Name = document.getElementById('move1Name').value || 'Move 1';
             const move1Dmg = document.getElementById('move1Dmg').value || '0';
@@ -653,6 +675,7 @@
             
             document.getElementById('previewName').textContent = name;
             document.getElementById('previewTypeIcon').textContent = typeIcons[type];
+            document.getElementById('previewHp').textContent = '❤️ ' + hp;
             
             // Update moves
             document.getElementById('previewMove1').innerHTML = `<span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
@@ -673,24 +696,37 @@
                 specialSection.style.display = 'none';
                 energyInfo.style.display = 'block';
                 cardImage.style.display = 'none';
+                document.getElementById('previewHp').style.display = 'none';
                 energyInfo.innerHTML = `<div class="energy-amount">+${energyAmountVal}</div><div class="energy-type-label">${energyName}</div>`;
                 document.getElementById('movesSection').style.display = 'none';
                 document.getElementById('specialMoveSection').style.display = 'none';
                 document.getElementById('energyAmountGroup').style.display = 'block';
+                document.getElementById('hpGroup').style.display = 'none';
             } else if (cardCategory === 'special') {
                 cardImage.style.display = 'flex';
                 document.getElementById('energyAmountGroup').style.display = 'none';
+                document.getElementById('previewHp').style.display = 'inline';
+                document.getElementById('hpGroup').style.display = 'block';
                 movesSection.style.display = 'block';
-                specialSection.style.display = 'block';
+                specialSection.style.display = 'none';
                 energyInfo.style.display = 'none';
-                specialSection.innerHTML = `<div class="move special"><span class="move-cost">${specialCost}${energySymbol}</span><span class="move-name">${specialName}</span><span class="move-dmg">${specialDmg}</span></div>`;
+                // Make move 3 look like a special/mega move
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name" style="color:#ffd700;font-weight:bold;">⭐ ${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').style.background = 'linear-gradient(90deg, rgba(255,215,0,0.3), rgba(255,100,0,0.3))';
+                document.getElementById('previewMove3').style.border = '1px solid #ffd700';
                 document.getElementById('movesSection').style.display = 'block';
-                document.getElementById('specialMoveSection').style.display = 'block';
+                document.getElementById('specialMoveSection').style.display = 'none';
             } else {
                 movesSection.style.display = 'block';
                 specialSection.style.display = 'none';
                 energyInfo.style.display = 'none';
                 cardImage.style.display = 'flex';
+                document.getElementById('previewHp').style.display = 'inline';
+                document.getElementById('hpGroup').style.display = 'block';
+                // Reset move 3 to normal style
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').style.background = 'rgba(255,255,255,0.1)';
+                document.getElementById('previewMove3').style.border = 'none';
                 document.getElementById('movesSection').style.display = 'block';
                 document.getElementById('specialMoveSection').style.display = 'none';
                 document.getElementById('energyAmountGroup').style.display = 'none';
