@@ -98,6 +98,38 @@
         }
         .generate-btn:hover {
             transform: scale(1.02);
+        }
+        .add-art-btn, .upload-btn {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .add-art-btn:hover, .upload-btn:hover {
+            transform: scale(1.02);
+        }
+        .print-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #2196F3, #1565C0);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+        .print-btn:hover {
+            transform: scale(1.02);
             box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
         }
         
@@ -267,6 +299,24 @@
             margin-top: 10px;
         }
         .copy-btn:hover { background: #45a049; }
+        
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .card, .card * {
+                visibility: visible;
+            }
+            .card {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
     </style>
 </head>
 <body>
@@ -331,7 +381,21 @@
                 <textarea id="artStyle" placeholder="Describe the art style you want...">epic fantasy art, dark and dramatic lighting, detailed scales, glowing purple eyes, manga style</textarea>
             </div>
             
-            <button class="generate-btn" onclick="generateCard()">✨ Generate Card Art!</button>
+            <button class="generate-btn" onclick="generateCard()">✨ Get ChatGPT Prompt</button>
+            
+            <div class="form-group" style="margin-top: 20px;">
+                <label>🖼️ Add Art to Card (paste image URL)</label>
+                <input type="text" id="imageUrl" placeholder="Paste image URL here...">
+            </div>
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button class="add-art-btn" onclick="addArtFromUrl()">🖼️ Add Art</button>
+                <label class="upload-btn">
+                    📁 Upload Image
+                    <input type="file" id="imageUpload" accept="image/*" onchange="uploadImage(event)" style="display: none;">
+                </label>
+            </div>
+            
+            <button class="print-btn" onclick="printCard()">🖨️ Print Card</button>
             
             <div class="prompt-display" id="promptDisplay">
                 <h3>📋 Prompt for ChatGPT</h3>
@@ -448,6 +512,39 @@ Make it vertical/portrait orientation like a trading card. Don't include any tex
                 btn.textContent = '✅ Copied!';
                 setTimeout(() => { btn.textContent = '📋 Copy to Clipboard'; }, 2000);
             });
+        }
+        
+        // Add art from URL
+        function addArtFromUrl() {
+            const url = document.getElementById('imageUrl').value.trim();
+            if (!url) {
+                alert('Please paste an image URL first!');
+                return;
+            }
+            setCardImage(url);
+        }
+        
+        // Upload image
+        function uploadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    setCardImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Set card image
+        function setCardImage(src) {
+            const imageDiv = document.getElementById('previewImage');
+            imageDiv.innerHTML = `<img src="${src}" alt="Card Art" onerror="this.parentElement.innerHTML='<div class=\\'placeholder\\'>❌ Image failed to load</div>'">`;
+        }
+        
+        // Print card
+        function printCard() {
+            window.print();
         }
         
         // Initial update
