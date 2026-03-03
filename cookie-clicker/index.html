@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cookie Clicker - Guinea Pig Edition!</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -67,6 +67,9 @@
             object-fit: cover;
             border: 6px solid #8B4513;
             box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
         .guinea-pig:hover {
             transform: scale(1.05);
@@ -117,6 +120,11 @@
         }
         .villain:hover { transform: scale(1.1); }
         .villain:active { transform: scale(0.9); }
+        .villain {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
         .villain-hp {
             margin-top: 15px;
             color: white;
