@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wiggle - Mouse Survival!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            user-select: none;
+            overflow: hidden;
+        }
+        body {
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .back-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            z-index: 100;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        #gameCanvas {
+            border: 4px solid #444;
+            border-radius: 8px;
+            background: #2d2d2d;
+        }
+        .hud {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 1.1rem;
+            text-align: right;
+            z-index: 100;
+        }
+        .hud div { margin-bottom: 5px; }
+        .controls-hint {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            padding: 40px 60px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+            border: 3px solid #ff4444;
+        }
+        .game-over h2 { color: #ff4444; font-size: 2rem; margin-bottom: 15px; }
+        .game-over p { color: #ccc; margin-bottom: 20px; }
+        .game-over button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .game-over button:hover { background: #ff6666; }
+        .level-msg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffff00;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px #000;
+            z-index: 150;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-btn">← Back</a>
+    
+    <div class="hud">
+        <div>🐭 Lives: <span id="lives">3</span></div>
+        <div>🧀 Cheese: <span id="cheese">0</span></div>
+        <div>📍 <span id="location">City Street</span></div>
+    </div>
+    
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    
+    <p class="controls-hint">Arrow keys / WASD to move • Find sewer grates to escape! • Collect cheese!</p>
+    
+    <div class="game-over" id="gameOver">
+        <h2>SQUISHED! 💀</h2>
+        <p>You collected <span id="finalCheese">0</span> cheese!</p>
+        <button onclick="restartGame()">Try Again</button>
+    </div>
+    
+    <div class="level-msg" id="levelMsg"></div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        let gameRunning = true;
+        let lives = 3;
+        let cheese = 0;
+        let currentArea = 'street'; // 'street' or 'sewer'
+        let wiggleOffset = 0;
+        let invincibleTime = 0;
+        
+        // Mouse player
+        const mouse = {
+            x: 400,
+            y: 400,
+            width: 20,
+            height: 14,
+            speed: 4,
+            vx: 0,
+            vy: 0
+        };
+        
+        // Input
+        const keys = {};
+        
+        // People (enemies on street)
+        let people = [];
+        
+        // Sewer grates
+        let sewerGrates = [];
+        
+        // Cheese pickups
+        let cheeses = [];
+        
+        // Sewer exit
+        let sewerExit = null;
+        
+        // Initialize street level
+        function initStreet() {
+            currentArea = 'street';
+            document.getElementById('location').textContent = 'City Street';
+            mouse.x = 100;
+            mouse.y = 400;
+            
+            // Create people
+            people = [];
+            for (let i = 0; i < 6; i++) {
+                people.push(createPerson());
+            }
+            
+            // Create sewer grates
+            sewerGrates = [
+                { x: 700, y: 450, width: 50, height: 30 },
+                { x: 350, y: 100, width: 50, height: 30 },
+                { x: 150, y: 280, width: 50, height: 30 }
+            ];
+            
+            // Create cheese
+            cheeses = [];
+            for (let i = 0; i < 5; i++) {
+                cheeses.push({
+                    x: 100 + Math.random() * 600,
+                    y: 80 + Math.random() * 380,
+                    collected: false
+                });
+            }
+        }
+        
+        // Initialize sewer level
+        function initSewer() {
+            currentArea = 'sewer';
+            document.getElementById('location').textContent = 'Sewers';
+            mouse.x = 100;
+            mouse.y = 250;
+            
+            people = []; // No people in sewers
+            sewerGrates = [];
+            
+            // Sewer exit back to street
+            sewerExit = { x: 700, y: 450, width: 50, height: 30 };
+            
+            // More cheese in sewers!
+            cheeses = [];
+            for (let i = 0; i < 8; i++) {
+                cheeses.push({
+                    x: 100 + Math.random() * 600,
+                    y: 80 + Math.random() * 380,
+                    collected: false
+                });
+            }
+        }
+        
+        function createPerson() {
+            const fromLeft = Math.random() > 0.5;
+            return {
+                x: fromLeft ? -60 : canvas.width + 60,
+                y: 50 + Math.random() * 400,
+                width: 50,
+                height: 80,
+                speed: 1 + Math.random() * 2,
+                direction: fromLeft ? 1 : -1,
+                footStep: 0,
+                chasing: false,
+                shoeY: 0,
+                stomping: false
+            };
+        }
+        
+        // Draw street background
+        function drawStreet() {
+            // Sidewalk
+            ctx.fillStyle = '#888888';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Road
+            ctx.fillStyle = '#333333';
+            ctx.fillRect(0, 200, canvas.width, 150);
+            
+            // Road lines
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([30, 20]);
+            ctx.beginPath();
+            ctx.moveTo(0, 275);
+            ctx.lineTo(canvas.width, 275);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Buildings in background
+            ctx.fillStyle = '#555555';
+            ctx.fillRect(0, 0, canvas.width, 60);
+            for (let i = 0; i < 8; i++) {
+                ctx.fillStyle = '#444444';
+                ctx.fillRect(i * 100 + 10, 0, 80, 60);
+                // Windows
+                ctx.fillStyle = '#ffff88';
+                for (let j = 0; j < 3; j++) {
+                    ctx.fillRect(i * 100 + 20 + j * 25, 15, 15, 20);
+                }
+            }
+        }
+        
+        // Draw sewer background
+        function drawSewer() {
+            // Dark sewer walls
+            ctx.fillStyle = '#1a2a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Water channel
+            ctx.fillStyle = '#0a3a0a';
+            ctx.fillRect(0, 220, canvas.width, 80);
+            
+            // Pipes
+            ctx.fillStyle = '#2a3a2a';
+            ctx.fillRect(0, 50, canvas.width, 30);
+            ctx.fillRect(0, 420, canvas.width, 30);
+            
+            // Pipe openings
+            for (let i = 0; i < 5; i++) {
+                ctx.fillStyle = '#0a1a0a';
+                ctx.beginPath();
+                ctx.arc(100 + i * 150, 50, 20, 0, Math.PI);
+                ctx.fill();
+            }
+            
+            // Dripping water effect
+            ctx.fillStyle = '#3a5a3a';
+            for (let i = 0; i < 10; i++) {
+                const dripX = (Date.now() / 10 + i * 80) % canvas.width;
+                ctx.fillRect(dripX, 80, 2, 10 + Math.sin(Date.now() / 200 + i) * 5);
+            }
+        }
+        
+        // Draw mouse with wiggle
+        function drawMouse() {
+            if (invincibleTime > 0 && Math.floor(invincibleTime / 5) % 2 === 0) {
+                return; // Flashing when invincible
+            }
+            
+            const wiggle = Math.sin(wiggleOffset) * 3;
+            
+            ctx.save();
+            ctx.translate(mouse.x, mouse.y + wiggle);
+            
+            // Body
+            ctx.fillStyle = '#888888';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, mouse.width / 2, mouse.height / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Head
+            ctx.fillStyle = '#999999';
+            ctx.beginPath();
+            ctx.ellipse(mouse.width / 2 - 2, -2, 8, 6, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ears
+            ctx.fillStyle = '#ffaaaa';
+            ctx.beginPath();
+            ctx.arc(mouse.width / 2 + 2, -8, 5, 0, Math.PI * 2);
+            ctx.arc(mouse.width / 2 - 4, -9, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eye
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(mouse.width / 2 + 4, -3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Nose
+            ctx.fillStyle = '#ff6666';
+            ctx.beginPath();
+            ctx.arc(mouse.width / 2 + 10, 0, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Tail
+            ctx.strokeStyle = '#ffaaaa';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-mouse.width / 2, 0);
+            const tailWiggle = Math.sin(wiggleOffset * 1.5) * 8;
+            ctx.quadraticCurveTo(-mouse.width / 2 - 15, tailWiggle, -mouse.width / 2 - 25, tailWiggle * 0.5);
+            ctx.stroke();
+            
+            ctx.restore();
+        }
+        
+        // Draw person
+        function drawPerson(p) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            if (p.direction < 0) ctx.scale(-1, 1);
+            
+            const footBob = Math.sin(p.footStep) * 5;
+            
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(0, p.height / 2 + 5, 25, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Legs
+            ctx.fillStyle = '#3344aa';
+            ctx.fillRect(-15, 20 + footBob, 12, 40);
+            ctx.fillRect(3, 20 - footBob, 12, 40);
+            
+            // Body
+            ctx.fillStyle = '#aa4444';
+            ctx.fillRect(-18, -20, 36, 45);
+            
+            // Head
+            ctx.fillStyle = '#ffcc99';
+            ctx.beginPath();
+            ctx.arc(0, -35, 18, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes looking for mouse
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-6, -38, 3, 0, Math.PI * 2);
+            ctx.arc(6, -38, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Shoe (for stomping!)
+            if (p.stomping) {
+                ctx.fillStyle = '#222';
+                ctx.fillRect(-20, 60 + p.shoeY, 40, 15);
+            }
+            
+            ctx.restore();
+        }
+        
+        // Draw sewer grate
+        function drawGrate(g) {
+            ctx.fillStyle = '#333';
+            ctx.fillRect(g.x, g.y, g.width, g.height);
+            
+            // Grate bars
+            ctx.strokeStyle = '#555';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(g.x + 5 + i * 10, g.y);
+                ctx.lineTo(g.x + 5 + i * 10, g.y + g.height);
+                ctx.stroke();
+            }
+            
+            // Glow effect
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(g.x, g.y, g.width, g.height);
+        }
+        
+        // Draw sewer exit
+        function drawSewerExit() {
+            if (!sewerExit) return;
+            
+            ctx.fillStyle = '#444';
+            ctx.fillRect(sewerExit.x, sewerExit.y, sewerExit.width, sewerExit.height);
+            
+            // Ladder
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(sewerExit.x + 15, sewerExit.y);
+            ctx.lineTo(sewerExit.x + 15, sewerExit.y - 40);
+            ctx.moveTo(sewerExit.x + 35, sewerExit.y);
+            ctx.lineTo(sewerExit.x + 35, sewerExit.y - 40);
+            ctx.stroke();
+            
+            // Rungs
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.moveTo(sewerExit.x + 15, sewerExit.y - 10 - i * 10);
+                ctx.lineTo(sewerExit.x + 35, sewerExit.y - 10 - i * 10);
+                ctx.stroke();
+            }
+            
+            // Light from above
+            ctx.fillStyle = 'rgba(255, 255, 200, 0.3)';
+            ctx.beginPath();
+            ctx.moveTo(sewerExit.x, sewerExit.y);
+            ctx.lineTo(sewerExit.x + sewerExit.width, sewerExit.y);
+            ctx.lineTo(sewerExit.x + sewerExit.width + 20, sewerExit.y + 60);
+            ctx.lineTo(sewerExit.x - 20, sewerExit.y + 60);
+            ctx.fill();
+        }
+        
+        // Draw cheese
+        function drawCheese(c) {
+            if (c.collected) return;
+            
+            ctx.save();
+            ctx.translate(c.x, c.y);
+            
+            // Cheese wedge
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(15, 8);
+            ctx.lineTo(-15, 8);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Holes
+            ctx.fillStyle = '#ff9900';
+            ctx.beginPath();
+            ctx.arc(-3, 0, 3, 0, Math.PI * 2);
+            ctx.arc(5, 3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        // Update game
+        function update() {
+            if (!gameRunning) return;
+            
+            // Handle input
+            mouse.vx = 0;
+            mouse.vy = 0;
+            
+            if (keys['ArrowLeft'] || keys['KeyA']) mouse.vx = -mouse.speed;
+            if (keys['ArrowRight'] || keys['KeyD']) mouse.vx = mouse.speed;
+            if (keys['ArrowUp'] || keys['KeyW']) mouse.vy = -mouse.speed;
+            if (keys['ArrowDown'] || keys['KeyS']) mouse.vy = mouse.speed;
+            
+            // Move mouse
+            mouse.x += mouse.vx;
+            mouse.y += mouse.vy;
+            
+            // Wiggle when moving
+            if (mouse.vx !== 0 || mouse.vy !== 0) {
+                wiggleOffset += 0.5;
+            }
+            
+            // Bounds
+            mouse.x = Math.max(20, Math.min(canvas.width - 20, mouse.x));
+            mouse.y = Math.max(40, Math.min(canvas.height - 20, mouse.y));
+            
+            // Invincibility countdown
+            if (invincibleTime > 0) invincibleTime--;
+            
+            // Update people
+            if (currentArea === 'street') {
+                people.forEach(p => {
+                    p.footStep += 0.15;
+                    
+                    // Check if sees mouse
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 150) {
+                        p.chasing = true;
+                        // Move toward mouse
+                        p.x += (dx / dist) * (p.speed + 1);
+                        p.y += (dy / dist) * (p.speed + 1);
+                        p.direction = dx > 0 ? 1 : -1;
+                        
+                        // Stomp attack!
+                        if (dist < 40 && !p.stomping) {
+                            p.stomping = true;
+                            p.shoeY = -30;
+                        }
+                    } else {
+                        p.chasing = false;
+                        p.x += p.speed * p.direction;
+                    }
+                    
+                    // Stomp animation
+                    if (p.stomping) {
+                        p.shoeY += 8;
+                        if (p.shoeY > 20) {
+                            p.stomping = false;
+                            p.shoeY = 0;
+                            
+                            // Check if stomped mouse
+                            if (dist < 35 && invincibleTime <= 0) {
+                                hitMouse();
+                            }
+                        }
+                    }
+                    
+                    // Respawn if off screen
+                    if (p.x < -100 || p.x > canvas.width + 100) {
+                        Object.assign(p, createPerson());
+                    }
+                });
+            }
+            
+            // Check sewer grates
+            sewerGrates.forEach(g => {
+                if (mouse.x > g.x && mouse.x < g.x + g.width &&
+                    mouse.y > g.y && mouse.y < g.y + g.height) {
+                    showMessage('Into the sewers! 🕳️');
+                    setTimeout(initSewer, 500);
+                }
+            });
+            
+            // Check sewer exit
+            if (sewerExit && mouse.x > sewerExit.x && mouse.x < sewerExit.x + sewerExit.width &&
+                mouse.y > sewerExit.y && mouse.y < sewerExit.y + sewerExit.height) {
+                showMessage('Back to the street! ☀️');
+                setTimeout(initStreet, 500);
+            }
+            
+            // Collect cheese
+            cheeses.forEach(c => {
+                if (!c.collected) {
+                    const dx = mouse.x - c.x;
+                    const dy = mouse.y - c.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 20) {
+                        c.collected = true;
+                        cheese++;
+                        document.getElementById('cheese').textContent = cheese;
+                    }
+                }
+            });
+            
+            // Spawn more cheese occasionally
+            if (cheeses.filter(c => !c.collected).length < 2) {
+                cheeses.push({
+                    x: 100 + Math.random() * 600,
+                    y: 80 + Math.random() * 380,
+                    collected: false
+                });
+            }
+        }
+        
+        function hitMouse() {
+            lives--;
+            document.getElementById('lives').textContent = lives;
+            invincibleTime = 120; // 2 seconds invincibility
+            
+            if (lives <= 0) {
+                gameOver();
+            } else {
+                showMessage('OUCH! 💥');
+            }
+        }
+        
+        function showMessage(text) {
+            const msg = document.getElementById('levelMsg');
+            msg.textContent = text;
+            msg.style.opacity = 1;
+            setTimeout(() => { msg.style.opacity = 0; }, 1500);
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalCheese').textContent = cheese;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        function restartGame() {
+            gameRunning = true;
+            lives = 3;
+            cheese = 0;
+            invincibleTime = 0;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('cheese').textContent = cheese;
+            document.getElementById('gameOver').style.display = 'none';
+            initStreet();
+        }
+        
+        // Draw everything
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            if (currentArea === 'street') {
+                drawStreet();
+            } else {
+                drawSewer();
+            }
+            
+            // Cheese
+            cheeses.forEach(drawCheese);
+            
+            // Grates
+            sewerGrates.forEach(drawGrate);
+            drawSewerExit();
+            
+            // People
+            people.forEach(drawPerson);
+            
+            // Mouse
+            drawMouse();
+        }
+        
+        // Game loop
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Input handlers
+        document.addEventListener('keydown', e => {
+            keys[e.code] = true;
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+        document.addEventListener('keyup', e => { keys[e.code] = false; });
+        
+        // Touch controls
+        let touchStartX = 0, touchStartY = 0;
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        });
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+            
+            keys['ArrowLeft'] = dx < -20;
+            keys['ArrowRight'] = dx > 20;
+            keys['ArrowUp'] = dy < -20;
+            keys['ArrowDown'] = dy > 20;
+        });
+        canvas.addEventListener('touchend', () => {
+            keys['ArrowLeft'] = false;
+            keys['ArrowRight'] = false;
+            keys['ArrowUp'] = false;
+            keys['ArrowDown'] = false;
+        });
+        
+        // Start game
+        initStreet();
+        gameLoop();
+    </script>
+</body>
+</html>
