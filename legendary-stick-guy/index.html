@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legendary Stick Guy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a0a0a, #2a1a1a, #1a0a1a);
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+        .back-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            z-index: 100;
+            font-size: 0.9rem;
+        }
+        
+        /* Header Stats */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+        }
+        .title {
+            font-size: 1.5rem;
+            color: #ff6600;
+            text-shadow: 0 0 10px #ff6600;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1rem;
+        }
+        .stat { display: flex; align-items: center; gap: 5px; }
+        .stat-icon { font-size: 1.2rem; }
+        .gold { color: #ffd700; }
+        .xp { color: #00ff88; }
+        .level { color: #ff00ff; }
+        
+        /* Game Area */
+        .game-container {
+            display: flex;
+            height: 100vh;
+            padding-top: 50px;
+        }
+        
+        /* Battle Arena */
+        .arena {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .wave-info {
+            position: absolute;
+            top: 20px;
+            font-size: 1.5rem;
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff0000;
+        }
+        .battle-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        /* Characters */
+        .character {
+            text-align: center;
+            transition: transform 0.1s;
+        }
+        .character.attacking { animation: attack 0.3s ease-out; }
+        .character.hurt { animation: hurt 0.2s ease-out; }
+        @keyframes attack { 50% { transform: translateX(30px); } }
+        @keyframes hurt { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
+        
+        .stick-figure {
+            font-size: 80px;
+            line-height: 1;
+        }
+        .enemy-figure {
+            font-size: 70px;
+            line-height: 1;
+        }
+        .char-name {
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+        
+        /* Health Bars */
+        .health-bar-container {
+            width: 120px;
+            height: 15px;
+            background: #333;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .health-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #88ff00);
+            transition: width 0.3s;
+        }
+        .health-bar.enemy { background: linear-gradient(90deg, #ff0000, #ff4444); }
+        .health-text {
+            font-size: 0.8rem;
+            margin-top: 3px;
+        }
+        
+        /* Action Buttons */
+        .actions {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+        .action-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        .attack-btn {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+        }
+        .attack-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #ff0000; }
+        .heal-btn {
+            background: linear-gradient(135deg, #44ff44, #00cc00);
+            color: white;
+        }
+        .heal-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #00ff00; }
+        .heal-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        /* Combat Log */
+        .combat-log {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        /* Shop Panel */
+        .shop {
+            width: 280px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            overflow-y: auto;
+            border-left: 2px solid #333;
+        }
+        .shop h2 {
+            text-align: center;
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .upgrade {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .upgrade:hover { border-color: #ffd700; background: rgba(255,255,255,0.15); }
+        .upgrade.maxed { opacity: 0.5; cursor: not-allowed; border-color: #888; }
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .upgrade-name { font-weight: bold; color: #fff; }
+        .upgrade-level { color: #888; font-size: 0.85rem; }
+        .upgrade-cost { color: #ffd700; font-size: 0.9rem; }
+        .upgrade-desc { font-size: 0.8rem; color: #aaa; }
+        .upgrade-effect { font-size: 0.85rem; color: #00ff88; margin-top: 5px; }
+        
+        /* Floating Damage */
+        .float-damage {
+            position: fixed;
+            font-weight: bold;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .float-damage.player { color: #ff4444; }
+        .float-damage.enemy { color: #ffff00; }
+        .float-damage.heal { color: #00ff00; }
+        .float-damage.gold { color: #ffd700; }
+        .float-damage.xp { color: #00ff88; }
+        .float-damage.crit { font-size: 2rem; color: #ff00ff; }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+        }
+        
+        /* Level Up Effect */
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #ff00ff;
+            text-shadow: 0 0 30px #ff00ff;
+            animation: levelUp 1.5s ease-out forwards;
+            pointer-events: none;
+            z-index: 200;
+        }
+        @keyframes levelUp {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* Death Screen */
+        .death-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .death-screen.hidden { display: none; }
+        .death-screen h1 { font-size: 4rem; color: #ff0000; margin-bottom: 20px; }
+        .death-screen p { font-size: 1.5rem; margin-bottom: 30px; }
+        .death-screen button {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            background: #ff6600;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-btn">← Back</a>
+    
+    <div class="header">
+        <div class="title">⚔️ Legendary Stick Guy</div>
+        <div class="stats">
+            <div class="stat level"><span class="stat-icon">⭐</span> Level <span id="level">1</span></div>
+            <div class="stat xp"><span class="stat-icon">✨</span> <span id="xp">0</span>/<span id="xpNeeded">100</span> XP</div>
+            <div class="stat gold"><span class="stat-icon">💰</span> <span id="gold">0</span></div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <div class="arena">
+            <div class="wave-info">☠️ Wave <span id="wave">1</span> - <span id="enemyType">Slime</span></div>
+            
+            <div class="battle-area">
+                <div class="character" id="player">
+                    <div class="stick-figure">🧍</div>
+                    <div class="char-name">Stick Guy</div>
+                    <div class="health-bar-container">
+                        <div class="health-bar" id="playerHealthBar"></div>
+                    </div>
+                    <div class="health-text"><span id="playerHp">100</span>/<span id="playerMaxHp">100</span> HP</div>
+                </div>
+                
+                <div class="character" id="enemy">
+                    <div class="enemy-figure" id="enemySprite">🟢</div>
+                    <div class="char-name" id="enemyName">Slime</div>
+                    <div class="health-bar-container">
+                        <div class="health-bar enemy" id="enemyHealthBar"></div>
+                    </div>
+                    <div class="health-text"><span id="enemyHp">50</span>/<span id="enemyMaxHp">50</span> HP</div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button class="action-btn attack-btn" id="attackBtn">⚔️ ATTACK</button>
+                <button class="action-btn heal-btn" id="healBtn">💚 HEAL (3)</button>
+            </div>
+            
+            <div class="combat-log" id="combatLog">Click ATTACK to fight!</div>
+        </div>
+        
+        <div class="shop">
+            <h2>🛒 Upgrades</h2>
+            <div id="upgradeList"></div>
+        </div>
+    </div>
+    
+    <div class="death-screen hidden" id="deathScreen">
+        <h1>💀 YOU DIED</h1>
+        <p>You reached Wave <span id="finalWave">1</span>!</p>
+        <p>Total Gold Earned: <span id="finalGold">0</span> 💰</p>
+        <button id="restartBtn">⚔️ Fight Again</button>
+    </div>
+    
+    <script>
+        // Player Stats
+        let player = {
+            level: 1,
+            xp: 0,
+            xpNeeded: 100,
+            gold: 0,
+            totalGold: 0,
+            hp: 100,
+            maxHp: 100,
+            damage: 10,
+            critChance: 5,
+            critMultiplier: 2,
+            healAmount: 30,
+            healCharges: 3,
+            maxHealCharges: 3
+        };
+        
+        // Upgrades
+        const upgrades = [
+            { name: '⚔️ Sharper Sword', desc: 'Increase damage', effect: () => `+${5 + player.level * 2} damage`, stat: 'damage', increase: () => 5 + player.level * 2, baseCost: 50, level: 0, maxLevel: 20 },
+            { name: '❤️ Vitality', desc: 'Increase max HP', effect: () => `+${20 + player.level * 5} max HP`, stat: 'maxHp', increase: () => 20 + player.level * 5, baseCost: 40, level: 0, maxLevel: 20 },
+            { name: '🎯 Critical Eye', desc: 'Increase crit chance', effect: () => `+5% crit chance`, stat: 'critChance', increase: () => 5, baseCost: 80, level: 0, maxLevel: 15 },
+            { name: '💥 Critical Power', desc: 'Increase crit damage', effect: () => `+0.5x crit multiplier`, stat: 'critMultiplier', increase: () => 0.5, baseCost: 100, level: 0, maxLevel: 10 },
+            { name: '💚 Better Potions', desc: 'Heal more per use', effect: () => `+15 heal amount`, stat: 'healAmount', increase: () => 15, baseCost: 60, level: 0, maxLevel: 15 },
+            { name: '🧪 More Potions', desc: 'Extra heal charges', effect: () => `+1 heal charge`, stat: 'maxHealCharges', increase: () => 1, baseCost: 120, level: 0, maxLevel: 5 }
+        ];
+        
+        // Enemies
+        const enemyTypes = [
+            { name: 'Slime', sprite: '🟢', baseHp: 50, baseDamage: 5 },
+            { name: 'Goblin', sprite: '👺', baseHp: 80, baseDamage: 8 },
+            { name: 'Skeleton', sprite: '💀', baseHp: 100, baseDamage: 12 },
+            { name: 'Orc', sprite: '👹', baseHp: 150, baseDamage: 15 },
+            { name: 'Dark Knight', sprite: '🖤', baseHp: 200, baseDamage: 20 },
+            { name: 'Demon', sprite: '😈', baseHp: 300, baseDamage: 25 },
+            { name: 'Dragon', sprite: '🐉', baseHp: 500, baseDamage: 35 },
+            { name: 'Death Lord', sprite: '☠️', baseHp: 750, baseDamage: 50 },
+            { name: 'Ancient Evil', sprite: '👁️', baseHp: 1000, baseDamage: 70 },
+            { name: 'THE FINAL BOSS', sprite: '🔥', baseHp: 2000, baseDamage: 100 }
+        ];
+        
+        let wave = 1;
+        let enemy = { hp: 50, maxHp: 50, damage: 5 };
+        let currentEnemyType = enemyTypes[0];
+        
+        // DOM Elements
+        const playerEl = document.getElementById('player');
+        const enemyEl = document.getElementById('enemy');
+        const attackBtn = document.getElementById('attackBtn');
+        const healBtn = document.getElementById('healBtn');
+        const combatLog = document.getElementById('combatLog');
+        const deathScreen = document.getElementById('deathScreen');
+        
+        function updateDisplay() {
+            document.getElementById('level').textContent = player.level;
+            document.getElementById('xp').textContent = player.xp;
+            document.getElementById('xpNeeded').textContent = player.xpNeeded;
+            document.getElementById('gold').textContent = player.gold;
+            
+            document.getElementById('playerHp').textContent = Math.max(0, Math.floor(player.hp));
+            document.getElementById('playerMaxHp').textContent = player.maxHp;
+            document.getElementById('playerHealthBar').style.width = (player.hp / player.maxHp * 100) + '%';
+            
+            document.getElementById('enemyHp').textContent = Math.max(0, Math.floor(enemy.hp));
+            document.getElementById('enemyMaxHp').textContent = enemy.maxHp;
+            document.getElementById('enemyHealthBar').style.width = (enemy.hp / enemy.maxHp * 100) + '%';
+            
+            document.getElementById('wave').textContent = wave;
+            document.getElementById('enemyType').textContent = currentEnemyType.name;
+            document.getElementById('enemyName').textContent = currentEnemyType.name;
+            document.getElementById('enemySprite').textContent = currentEnemyType.sprite;
+            
+            healBtn.textContent = `💚 HEAL (${player.healCharges})`;
+            healBtn.disabled = player.healCharges <= 0 || player.hp >= player.maxHp;
+            
+            renderUpgrades();
+        }
+        
+        function renderUpgrades() {
+            const list = document.getElementById('upgradeList');
+            list.innerHTML = '';
+            
+            upgrades.forEach((up, index) => {
+                const cost = Math.floor(up.baseCost * Math.pow(1.5, up.level));
+                const maxed = up.level >= up.maxLevel;
+                
+                const div = document.createElement('div');
+                div.className = 'upgrade' + (maxed ? ' maxed' : '');
+                div.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${up.name}</span>
+                        <span class="upgrade-level">Lv ${up.level}/${up.maxLevel}</span>
+                    </div>
+                    <div class="upgrade-desc">${up.desc}</div>
+                    <div class="upgrade-effect">${up.effect()}</div>
+                    <div class="upgrade-cost">${maxed ? 'MAXED' : `Cost: ${cost} 💰`}</div>
+                `;
+                
+                if (!maxed && player.gold >= cost) {
+                    div.addEventListener('click', () => buyUpgrade(index));
+                }
+                
+                list.appendChild(div);
+            });
+        }
+        
+        function buyUpgrade(index) {
+            const up = upgrades[index];
+            const cost = Math.floor(up.baseCost * Math.pow(1.5, up.level));
+            
+            if (player.gold >= cost && up.level < up.maxLevel) {
+                player.gold -= cost;
+                up.level++;
+                player[up.stat] += up.increase();
+                
+                if (up.stat === 'maxHp') {
+                    player.hp = Math.min(player.hp + up.increase(), player.maxHp);
+                }
+                if (up.stat === 'maxHealCharges') {
+                    player.healCharges = player.maxHealCharges;
+                }
+                
+                createFloatText(event.clientX, event.clientY, up.name + ' upgraded!', 'xp');
+                updateDisplay();
+            }
+        }
+        
+        function createFloatText(x, y, text, type) {
+            const el = document.createElement('div');
+            el.className = 'float-damage ' + type;
+            el.textContent = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+        
+        function attack() {
+            // Player attacks
+            let damage = player.damage;
+            let isCrit = Math.random() * 100 < player.critChance;
+            
+            if (isCrit) {
+                damage = Math.floor(damage * player.critMultiplier);
+            }
+            
+            enemy.hp -= damage;
+            playerEl.classList.add('attacking');
+            setTimeout(() => playerEl.classList.remove('attacking'), 300);
+            
+            const enemyRect = enemyEl.getBoundingClientRect();
+            createFloatText(enemyRect.left + 50, enemyRect.top, '-' + damage, isCrit ? 'crit' : 'enemy');
+            
+            combatLog.textContent = isCrit ? `💥 CRITICAL HIT! You deal ${damage} damage!` : `You deal ${damage} damage!`;
+            
+            updateDisplay();
+            
+            if (enemy.hp <= 0) {
+                enemyDefeated();
+                return;
+            }
+            
+            // Enemy attacks back
+            setTimeout(() => {
+                enemyAttack();
+            }, 500);
+        }
+        
+        function enemyAttack() {
+            const damage = enemy.damage + Math.floor(Math.random() * 5);
+            player.hp -= damage;
+            
+            enemyEl.classList.add('attacking');
+            setTimeout(() => enemyEl.classList.remove('attacking'), 300);
+            
+            playerEl.classList.add('hurt');
+            setTimeout(() => playerEl.classList.remove('hurt'), 200);
+            
+            const playerRect = playerEl.getBoundingClientRect();
+            createFloatText(playerRect.left + 50, playerRect.top, '-' + damage, 'player');
+            
+            combatLog.textContent = `${currentEnemyType.name} deals ${damage} damage to you!`;
+            
+            updateDisplay();
+            
+            if (player.hp <= 0) {
+                gameOver();
+            }
+        }
+        
+        function heal() {
+            if (player.healCharges > 0 && player.hp < player.maxHp) {
+                player.healCharges--;
+                const healed = Math.min(player.healAmount, player.maxHp - player.hp);
+                player.hp += healed;
+                
+                const playerRect = playerEl.getBoundingClientRect();
+                createFloatText(playerRect.left + 50, playerRect.top, '+' + healed, 'heal');
+                
+                combatLog.textContent = `You heal for ${healed} HP!`;
+                updateDisplay();
+            }
+        }
+        
+        function enemyDefeated() {
+            // Rewards
+            const goldReward = 10 + wave * 5 + Math.floor(Math.random() * wave * 3);
+            const xpReward = 20 + wave * 10;
+            
+            player.gold += goldReward;
+            player.totalGold += goldReward;
+            player.xp += xpReward;
+            
+            const enemyRect = enemyEl.getBoundingClientRect();
+            createFloatText(enemyRect.left + 30, enemyRect.top - 20, '+' + goldReward + ' 💰', 'gold');
+            setTimeout(() => {
+                createFloatText(enemyRect.left + 70, enemyRect.top - 20, '+' + xpReward + ' XP', 'xp');
+            }, 200);
+            
+            combatLog.textContent = `${currentEnemyType.name} defeated! +${goldReward} gold, +${xpReward} XP`;
+            
+            // Check level up
+            while (player.xp >= player.xpNeeded) {
+                player.xp -= player.xpNeeded;
+                player.level++;
+                player.xpNeeded = Math.floor(100 * Math.pow(1.3, player.level - 1));
+                player.maxHp += 10;
+                player.hp = player.maxHp;
+                player.damage += 2;
+                player.healCharges = player.maxHealCharges;
+                
+                const levelUp = document.createElement('div');
+                levelUp.className = 'level-up';
+                levelUp.textContent = '⭐ LEVEL UP! ⭐';
+                document.body.appendChild(levelUp);
+                setTimeout(() => levelUp.remove(), 1500);
+            }
+            
+            // Next wave
+            wave++;
+            spawnEnemy();
+            updateDisplay();
+        }
+        
+        function spawnEnemy() {
+            const typeIndex = Math.min(Math.floor((wave - 1) / 3), enemyTypes.length - 1);
+            currentEnemyType = enemyTypes[typeIndex];
+            
+            const waveMultiplier = 1 + (wave - 1) * 0.15;
+            enemy.maxHp = Math.floor(currentEnemyType.baseHp * waveMultiplier);
+            enemy.hp = enemy.maxHp;
+            enemy.damage = Math.floor(currentEnemyType.baseDamage * waveMultiplier);
+            
+            updateDisplay();
+        }
+        
+        function gameOver() {
+            document.getElementById('finalWave').textContent = wave;
+            document.getElementById('finalGold').textContent = player.totalGold;
+            deathScreen.classList.remove('hidden');
+        }
+        
+        function restart() {
+            player = {
+                level: 1, xp: 0, xpNeeded: 100, gold: 0, totalGold: 0,
+                hp: 100, maxHp: 100, damage: 10, critChance: 5, critMultiplier: 2,
+                healAmount: 30, healCharges: 3, maxHealCharges: 3
+            };
+            upgrades.forEach(up => up.level = 0);
+            wave = 1;
+            deathScreen.classList.add('hidden');
+            spawnEnemy();
+            updateDisplay();
+        }
+        
+        // Event Listeners
+        attackBtn.addEventListener('click', attack);
+        healBtn.addEventListener('click', heal);
+        document.getElementById('restartBtn').addEventListener('click', restart);
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === 'a') attack();
+            if (e.key === 'h') heal();
+        });
+        
+        // Initialize
+        spawnEnemy();
+        updateDisplay();
+    </script>
+</body>
+</html>
