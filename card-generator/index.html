@@ -233,16 +233,23 @@
         .rarity-epic .rarity-stars { color: #9C27B0; text-shadow: 0 0 5px #9C27B0; }
         .rarity-legendary .rarity-stars { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
         .rarity-secret .rarity-stars { 
-            background: linear-gradient(90deg, #000 0%, #fff 25%, #000 50%, #fff 75%, #000 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #000;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 15px #888;
             font-size: 1.2rem;
-            animation: secretShimmer 2s linear infinite;
+            animation: secretPulse 1.5s ease-in-out infinite;
         }
-        @keyframes secretShimmer {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        @keyframes secretPulse {
+            0%, 100% { 
+                color: #000;
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+            }
+            50% { 
+                color: #fff;
+                text-shadow: 0 0 5px #000, 0 0 10px #000;
+            }
         }
         .card.secret { 
             background: linear-gradient(135deg, #000 0%, #333 25%, #fff 50%, #333 75%, #000 100%);
