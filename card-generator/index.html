@@ -229,6 +229,12 @@
             text-align: center;
             margin-bottom: 5px;
         }
+        .rarity-label {
+            font-size: 0.55rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-bottom: 2px;
+        }
         .rarity-stars {
             color: #ffd700;
             font-size: 1rem;
@@ -496,6 +502,7 @@
                         <div class="placeholder">🎨<br>Art will appear here!</div>
                     </div>
                     <div class="card-rarity rarity-legendary" id="previewRarity">
+                        <div class="rarity-label" id="rarityLabel">LEGENDARY</div>
                         <span class="rarity-stars">★★★★★</span>
                     </div>
                     <div class="card-desc" id="previewDesc">A fearsome dragon born from the darkest shadows. Its eyes gleam with ancient power.</div>
@@ -561,6 +568,7 @@
             const rarityEl = document.getElementById('previewRarity');
             rarityEl.className = 'card-rarity rarity-' + rarity;
             rarityEl.querySelector('.rarity-stars').textContent = rarityStars[rarity];
+            document.getElementById('rarityLabel').textContent = rarity.toUpperCase();
         }
         
         // Add listeners to all inputs
