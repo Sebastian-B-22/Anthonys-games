@@ -205,6 +205,8 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 2px solid transparent;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         .upgrade:hover:not(.locked) {
             background: rgba(255,255,255,0.25);
@@ -436,7 +438,7 @@
                     <div class="upgrade-cost">Cost: ${formatNum(cost)} 🥕</div>
                 `;
                 if (canAfford) {
-                    div.onclick = () => buyUpgrade(i);
+                    div.onclick = (e) => buyUpgrade(i, e);
                 }
                 upgradeList.appendChild(div);
             });
@@ -460,14 +462,14 @@
                     <div class="upgrade-cost">${maxed ? 'MAXED!' : 'Cost: ' + formatNum(cost) + ' 🥕'}</div>
                 `;
                 if (canAfford && !maxed) {
-                    div.onclick = () => buyClickUpgrade(i);
+                    div.onclick = (e) => buyClickUpgrade(i, e);
                 }
                 upgradeList.appendChild(div);
             });
         }
         
         // Buy upgrade
-        function buyUpgrade(index) {
+        function buyUpgrade(index, e) {
             const up = upgrades[index];
             const cost = Math.floor(up.baseCost * Math.pow(1.15, up.owned));
             
@@ -475,13 +477,13 @@
                 treats -= cost;
                 up.owned++;
                 treatsPerSecond += up.tps;
-                createFloat(event.clientX, event.clientY, '+' + up.tps + ' TPS!', 'treat');
+                createFloat(e.clientX || 200, e.clientY || 200, '+' + up.tps + ' TPS!', 'treat');
                 updateDisplay();
             }
         }
         
         // Buy click upgrade
-        function buyClickUpgrade(index) {
+        function buyClickUpgrade(index, e) {
             const up = clickUpgrades[index];
             const cost = Math.floor(up.baseCost * Math.pow(1.5, up.owned));
             
@@ -489,7 +491,7 @@
                 treats -= cost;
                 up.owned++;
                 treatsPerClick += up.clickBonus;
-                createFloat(event.clientX, event.clientY, '+' + up.clickBonus + ' per click!', 'treat');
+                createFloat(e.clientX || 200, e.clientY || 200, '+' + up.clickBonus + ' per click!', 'treat');
                 updateDisplay();
             }
         }
