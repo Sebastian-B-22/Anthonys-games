@@ -8,9 +8,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a0a0a, #2a1a1a, #1a0a1a);
+            background: linear-gradient(135deg, #e0e0e0, #f5f5f5, #e8e8e8);
             min-height: 100vh;
-            color: white;
+            color: #222;
             overflow-x: hidden;
         }
         .back-btn {
@@ -81,10 +81,11 @@
         /* Left Panel - Player Info */
         .player-panel {
             width: 220px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(255,255,255,0.9);
             padding: 15px;
-            border-right: 2px solid #333;
+            border-right: 2px solid #ccc;
             overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
         .panel-title {
             color: #ff6600;
@@ -153,7 +154,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            background: radial-gradient(ellipse at bottom, #2a1a1a, #0a0a0a);
+            background: radial-gradient(ellipse at bottom, #d0d0d0, #f0f0f0);
         }
         
         /* Wave Info */
@@ -437,22 +438,24 @@
             bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(255,255,255,0.95);
             padding: 8px 20px;
             border-radius: 8px;
             font-size: 0.85rem;
             max-width: 500px;
             text-align: center;
-            border: 1px solid #333;
+            border: 2px solid #666;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
         /* Shop Panel */
         .shop {
             width: 260px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(255,255,255,0.9);
             padding: 15px;
             overflow-y: auto;
-            border-left: 2px solid #333;
+            border-left: 2px solid #ccc;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
         }
         .shop h2 {
             text-align: center;
