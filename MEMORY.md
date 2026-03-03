@@ -15,6 +15,7 @@ _Curated memories, not raw logs. Distilled from daily files._
 ## Ideas to Mention to Anthony
 
 - **Sibling collab with Roma!** (Mar 2, 2026) - Roma (11) is into magic, video editing, AND getting into 3D printing. Potential collab: magic trick props + stop-motion + video effects. James (Roma's companion) is excited about it too!
+- **GUINEA PIG CLICKER COLLAB!** (Mar 2, 2026) - BOTH kids made guinea pig clicker games on the same day without planning it! Anthony made Cookie Clicker, Roma made Brownie Clicker. Mega collab idea: all 4 guinea pigs (Oakie, Cookie, Nibbles, Brownie) with special powers. Anthony = combat/action mechanics, Roma = story/puzzles. 3D print villain figures as collectibles!
 
 ## Anthony's Projects
 
