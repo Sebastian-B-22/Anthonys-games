@@ -84,6 +84,13 @@
         .stat-row .form-group {
             flex: 1;
         }
+        .move-row {
+            display: flex;
+            gap: 10px;
+        }
+        .move-row input:first-child {
+            flex: 1;
+        }
         .generate-btn {
             width: 100%;
             padding: 15px;
@@ -271,27 +278,35 @@
             min-height: 45px;
         }
         
-        .card-stats {
-            display: flex;
-            justify-content: space-around;
+        .card-moves {
             background: rgba(0,0,0,0.3);
             border-radius: 5px;
-            padding: 8px;
+            padding: 6px;
         }
-        .stat {
-            text-align: center;
+        .move {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 8px;
+            margin-bottom: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
         }
-        .stat-label {
-            font-size: 0.65rem;
-            color: #aaa;
+        .move:last-child {
+            margin-bottom: 0;
         }
-        .stat-value {
-            font-size: 1.3rem;
+        .move-name {
+            font-size: 0.8rem;
             font-weight: bold;
         }
-        .stat-atk .stat-value { color: #ff6b6b; }
-        .stat-def .stat-value { color: #4ecdc4; }
-        .stat-spd .stat-value { color: #ffe66d; }
+        .move-dmg {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
         
         /* Generated prompt display */
         .prompt-display {
@@ -413,18 +428,18 @@
                 </select>
             </div>
             
-            <div class="stat-row">
-                <div class="form-group">
-                    <label>⚔️ Attack</label>
-                    <input type="number" id="cardAtk" value="850" min="0" max="9999">
+            <div class="form-group">
+                <label>⚡ Move 1</label>
+                <div class="move-row">
+                    <input type="text" id="move1Name" placeholder="Move name..." value="Thunder Strike">
+                    <input type="number" id="move1Dmg" placeholder="DMG" value="40" min="0" max="999" style="width: 70px;">
                 </div>
-                <div class="form-group">
-                    <label>🛡️ Defense</label>
-                    <input type="number" id="cardDef" value="600" min="0" max="9999">
-                </div>
-                <div class="form-group">
-                    <label>💨 Speed</label>
-                    <input type="number" id="cardSpd" value="400" min="0" max="9999">
+            </div>
+            <div class="form-group">
+                <label>🔥 Move 2</label>
+                <div class="move-row">
+                    <input type="text" id="move2Name" placeholder="Move name..." value="Volt Surge">
+                    <input type="number" id="move2Dmg" placeholder="DMG" value="80" min="0" max="999" style="width: 70px;">
                 </div>
             </div>
             
@@ -477,18 +492,14 @@
                         <span class="rarity-stars">★★★★★</span>
                     </div>
                     <div class="card-desc" id="previewDesc">A fearsome dragon born from the darkest shadows. Its eyes gleam with ancient power.</div>
-                    <div class="card-stats">
-                        <div class="stat stat-atk">
-                            <div class="stat-label">ATK</div>
-                            <div class="stat-value" id="previewAtk">850</div>
+                    <div class="card-moves">
+                        <div class="move" id="previewMove1">
+                            <span class="move-name">Thunder Strike</span>
+                            <span class="move-dmg">40</span>
                         </div>
-                        <div class="stat stat-def">
-                            <div class="stat-label">DEF</div>
-                            <div class="stat-value" id="previewDef">600</div>
-                        </div>
-                        <div class="stat stat-spd">
-                            <div class="stat-label">SPD</div>
-                            <div class="stat-value" id="previewSpd">400</div>
+                        <div class="move" id="previewMove2">
+                            <span class="move-name">Volt Surge</span>
+                            <span class="move-dmg">80</span>
                         </div>
                     </div>
                 </div>
@@ -516,16 +527,16 @@
             const name = document.getElementById('cardName').value || 'Unnamed';
             const type = document.getElementById('cardType').value;
             const rarity = document.getElementById('cardRarity').value;
-            const atk = document.getElementById('cardAtk').value || '0';
-            const def = document.getElementById('cardDef').value || '0';
-            const spd = document.getElementById('cardSpd').value || '0';
+            const move1Name = document.getElementById('move1Name').value || 'Move 1';
+            const move1Dmg = document.getElementById('move1Dmg').value || '0';
+            const move2Name = document.getElementById('move2Name').value || 'Move 2';
+            const move2Dmg = document.getElementById('move2Dmg').value || '0';
             const desc = document.getElementById('cardDesc').value || 'No description';
             
             document.getElementById('previewName').textContent = name;
             document.getElementById('previewTypeIcon').textContent = typeIcons[type];
-            document.getElementById('previewAtk').textContent = atk;
-            document.getElementById('previewDef').textContent = def;
-            document.getElementById('previewSpd').textContent = spd;
+            document.getElementById('previewMove1').innerHTML = `<span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
+            document.getElementById('previewMove2').innerHTML = `<span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
             document.getElementById('previewDesc').textContent = desc;
             
             // Update card background
