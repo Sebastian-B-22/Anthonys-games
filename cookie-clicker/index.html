@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Clicker - Guinea Pig Edition!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #87CEEB, #98FB98);
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 8px;
+            z-index: 100;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Main Area */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #4a3728;
+            text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 10px;
+        }
+        
+        .treat-count {
+            font-size: 2rem;
+            color: #2d5016;
+            margin-bottom: 5px;
+        }
+        .per-second {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        /* Cookie the Guinea Pig */
+        .guinea-pig {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+            object-fit: cover;
+            border: 8px solid #8B4513;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .guinea-pig:hover {
+            transform: scale(1.05);
+        }
+        .guinea-pig:active {
+            transform: scale(0.95);
+        }
+        
+        /* Villain Alert */
+        .villain-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,0,0,0.95);
+            padding: 30px 50px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 200;
+            animation: shake 0.5s infinite;
+            display: none;
+        }
+        .villain-alert.active { display: block; }
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(-2deg); }
+            75% { transform: translate(-50%, -50%) rotate(2deg); }
+        }
+        .villain-alert h2 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        .villain-alert p {
+            color: #ffcccc;
+            margin-bottom: 20px;
+        }
+        .villain {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: inline-block;
+        }
+        .villain:hover { transform: scale(1.1); }
+        .villain:active { transform: scale(0.9); }
+        .villain-hp {
+            margin-top: 15px;
+            color: white;
+        }
+        .hp-bar {
+            width: 200px;
+            height: 20px;
+            background: #660000;
+            border-radius: 10px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff4444);
+            transition: width 0.2s;
+        }
+        
+        /* Float Text */
+        .float-text {
+            position: fixed;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 150;
+        }
+        .float-text.treat { color: #ff8c00; text-shadow: 1px 1px 2px #000; }
+        .float-text.damage { color: #ff0000; font-size: 2rem; }
+        .float-text.victory { color: #00ff00; font-size: 2rem; }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+        }
+        
+        /* Shop */
+        .shop {
+            width: 320px;
+            background: linear-gradient(180deg, #8B4513, #654321);
+            padding: 20px;
+            overflow-y: auto;
+            color: white;
+        }
+        .shop h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        .upgrade {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .upgrade:hover:not(.locked) {
+            background: rgba(255,255,255,0.25);
+            border-color: #ffd700;
+        }
+        .upgrade.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .upgrade-owned {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .upgrade-desc {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+        .upgrade-effect {
+            font-size: 0.85rem;
+            color: #90EE90;
+        }
+        .upgrade-cost {
+            font-size: 0.9rem;
+            color: #ffd700;
+            margin-top: 5px;
+        }
+        
+        /* Stats Panel */
+        .stats-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .stats-panel h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 3px 0;
+        }
+        
+        /* Villain Warning Flash */
+        .warning-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,0,0,0.3);
+            pointer-events: none;
+            z-index: 190;
+            animation: flash 0.5s ease-out;
+            display: none;
+        }
+        .warning-flash.active { display: block; }
+        @keyframes flash {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* Cookie's Status */
+        .cookie-status {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        .cookie-status.happy { color: #2d5016; }
+        .cookie-status.scared { color: #cc0000; animation: shake 0.3s infinite; }
+    </style>
+</head>
+<body>
+    <a href="../" class="back-btn">← Back</a>
+    
+    <div class="main">
+        <h1>🐹 Cookie Clicker!</h1>
+        <div class="treat-count">🥕 <span id="treats">0</span> treats</div>
+        <div class="per-second"><span id="tps">0</span> treats per second</div>
+        
+        <img src="cookie.jpg" alt="Cookie the Guinea Pig" class="guinea-pig" id="cookie">
+        
+        <div class="cookie-status happy" id="cookieStatus">Cookie is happy! 🥰</div>
+    </div>
+    
+    <div class="shop">
+        <h2>🛒 Upgrades</h2>
+        <div id="upgradeList"></div>
+        
+        <div class="stats-panel">
+            <h3>📊 Stats</h3>
+            <div class="stat-row"><span>Total Clicks:</span><span id="totalClicks">0</span></div>
+            <div class="stat-row"><span>Treats per Click:</span><span id="treatsPerClick">1</span></div>
+            <div class="stat-row"><span>Villains Defeated:</span><span id="villainsDefeated">0</span></div>
+            <div class="stat-row"><span>Treats Stolen:</span><span id="treatsStolen">0</span></div>
+        </div>
+    </div>
+    
+    <div class="villain-alert" id="villainAlert">
+        <h2>⚠️ VILLAIN ATTACK! ⚠️</h2>
+        <p id="villainMessage">A villain is trying to steal Cookie's treats!</p>
+        <div class="villain" id="villainEmoji">🦊</div>
+        <div class="villain-hp">
+            <div class="hp-bar"><div class="hp-fill" id="villainHpBar"></div></div>
+            <span id="villainHpText">HP: 10/10</span>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.9rem;">Click the villain to defeat it!</p>
+    </div>
+    
+    <div class="warning-flash" id="warningFlash"></div>
+    
+    <script>
+        // Game State
+        let treats = 0;
+        let treatsPerSecond = 0;
+        let treatsPerClick = 1;
+        let totalClicks = 0;
+        let villainsDefeated = 0;
+        let treatsStolen = 0;
+        
+        // Villain State
+        let villainActive = false;
+        let villainHp = 0;
+        let villainMaxHp = 0;
+        let currentVillain = null;
+        let villainTimer = null;
+        let stealInterval = null;
+        
+        // Upgrades
+        const upgrades = [
+            { name: '🥬 Lettuce Patch', desc: 'Cookie munches lettuce automatically', tps: 1, baseCost: 15, owned: 0 },
+            { name: '🥕 Carrot Garden', desc: 'Fresh carrots every second', tps: 5, baseCost: 100, owned: 0 },
+            { name: '💧 Water Bottle', desc: 'Hydrated Cookie = Happy Cookie', tps: 15, baseCost: 500, owned: 0 },
+            { name: '🏠 Cozy Hideout', desc: 'A safe place to store treats', tps: 50, baseCost: 2000, owned: 0 },
+            { name: '🎡 Exercise Wheel', desc: 'Cookie runs and earns treats', tps: 150, baseCost: 8000, owned: 0 },
+            { name: '🌾 Hay Mountain', desc: 'Infinite hay = infinite happiness', tps: 400, baseCost: 25000, owned: 0 },
+            { name: '🏰 Guinea Pig Castle', desc: 'Cookie becomes royalty!', tps: 1000, baseCost: 80000, owned: 0 },
+            { name: '🚀 Treat Factory', desc: 'Industrial treat production', tps: 3000, baseCost: 300000, owned: 0 },
+            { name: '🌍 Veggie Empire', desc: 'Cookie rules the vegetable world', tps: 10000, baseCost: 1000000, owned: 0 },
+            { name: '⭐ Golden Pellets', desc: 'Legendary guinea pig food', tps: 50000, baseCost: 5000000, owned: 0 }
+        ];
+        
+        const clickUpgrades = [
+            { name: '🐾 Gentle Pets', desc: 'Pet Cookie for more treats!', clickBonus: 1, baseCost: 50, owned: 0, max: 20 },
+            { name: '😊 Happy Squeaks', desc: 'Cookie squeaks with joy', clickBonus: 5, baseCost: 500, owned: 0, max: 15 },
+            { name: '🎉 Popcorn Party', desc: 'Excited jumping = more treats', clickBonus: 25, baseCost: 5000, owned: 0, max: 10 },
+            { name: '👑 Royal Treatment', desc: 'Cookie feels like a king', clickBonus: 100, baseCost: 50000, owned: 0, max: 5 }
+        ];
+        
+        // Villains
+        const villains = [
+            { emoji: '🦊', name: 'Sneaky Fox', hp: 10, stealRate: 1, message: 'A fox wants Cookie\'s treats!' },
+            { emoji: '🐱', name: 'Hungry Cat', hp: 20, stealRate: 3, message: 'A cat is eyeing Cookie nervously!' },
+            { emoji: '🦅', name: 'Swooping Hawk', hp: 35, stealRate: 5, message: 'A hawk circles above!' },
+            { emoji: '🐍', name: 'Slithering Snake', hp: 50, stealRate: 8, message: 'A snake approaches Cookie!' },
+            { emoji: '🦝', name: 'Raccoon Thief', hp: 75, stealRate: 12, message: 'A raccoon wants to steal everything!' },
+            { emoji: '🐺', name: 'Big Bad Wolf', hp: 100, stealRate: 20, message: 'THE WOLF IS HERE! PROTECT COOKIE!' },
+            { emoji: '🐲', name: 'TREAT DRAGON', hp: 200, stealRate: 50, message: '🔥 A DRAGON ATTACKS! 🔥' }
+        ];
+        
+        // DOM Elements
+        const cookieEl = document.getElementById('cookie');
+        const treatsDisplay = document.getElementById('treats');
+        const tpsDisplay = document.getElementById('tps');
+        const upgradeList = document.getElementById('upgradeList');
+        const villainAlert = document.getElementById('villainAlert');
+        const villainEmoji = document.getElementById('villainEmoji');
+        const villainMessage = document.getElementById('villainMessage');
+        const villainHpBar = document.getElementById('villainHpBar');
+        const villainHpText = document.getElementById('villainHpText');
+        const warningFlash = document.getElementById('warningFlash');
+        const cookieStatus = document.getElementById('cookieStatus');
+        
+        // Format numbers
+        function formatNum(n) {
+            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+            return Math.floor(n).toString();
+        }
+        
+        // Update display
+        function updateDisplay() {
+            treatsDisplay.textContent = formatNum(treats);
+            tpsDisplay.textContent = formatNum(treatsPerSecond);
+            document.getElementById('totalClicks').textContent = totalClicks;
+            document.getElementById('treatsPerClick').textContent = treatsPerClick;
+            document.getElementById('villainsDefeated').textContent = villainsDefeated;
+            document.getElementById('treatsStolen').textContent = formatNum(treatsStolen);
+            renderUpgrades();
+        }
+        
+        // Render upgrades
+        function renderUpgrades() {
+            upgradeList.innerHTML = '<div style="color:#ffd700;margin-bottom:10px;font-weight:bold;">🥕 Auto Treats</div>';
+            
+            upgrades.forEach((up, i) => {
+                const cost = Math.floor(up.baseCost * Math.pow(1.15, up.owned));
+                const canAfford = treats >= cost;
+                
+                const div = document.createElement('div');
+                div.className = 'upgrade' + (canAfford ? '' : ' locked');
+                div.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${up.name}</span>
+                        <span class="upgrade-owned">[${up.owned}]</span>
+                    </div>
+                    <div class="upgrade-desc">${up.desc}</div>
+                    <div class="upgrade-effect">+${up.tps} treats/sec</div>
+                    <div class="upgrade-cost">Cost: ${formatNum(cost)} 🥕</div>
+                `;
+                if (canAfford) {
+                    div.onclick = () => buyUpgrade(i);
+                }
+                upgradeList.appendChild(div);
+            });
+            
+            upgradeList.innerHTML += '<div style="color:#ffd700;margin:15px 0 10px;font-weight:bold;">🐾 Click Power</div>';
+            
+            clickUpgrades.forEach((up, i) => {
+                const cost = Math.floor(up.baseCost * Math.pow(1.5, up.owned));
+                const canAfford = treats >= cost;
+                const maxed = up.owned >= up.max;
+                
+                const div = document.createElement('div');
+                div.className = 'upgrade' + (canAfford && !maxed ? '' : ' locked');
+                div.innerHTML = `
+                    <div class="upgrade-header">
+                        <span class="upgrade-name">${up.name}</span>
+                        <span class="upgrade-owned">[${up.owned}/${up.max}]</span>
+                    </div>
+                    <div class="upgrade-desc">${up.desc}</div>
+                    <div class="upgrade-effect">+${up.clickBonus} per click</div>
+                    <div class="upgrade-cost">${maxed ? 'MAXED!' : 'Cost: ' + formatNum(cost) + ' 🥕'}</div>
+                `;
+                if (canAfford && !maxed) {
+                    div.onclick = () => buyClickUpgrade(i);
+                }
+                upgradeList.appendChild(div);
+            });
+        }
+        
+        // Buy upgrade
+        function buyUpgrade(index) {
+            const up = upgrades[index];
+            const cost = Math.floor(up.baseCost * Math.pow(1.15, up.owned));
+            
+            if (treats >= cost) {
+                treats -= cost;
+                up.owned++;
+                treatsPerSecond += up.tps;
+                createFloat(event.clientX, event.clientY, '+' + up.tps + ' TPS!', 'treat');
+                updateDisplay();
+            }
+        }
+        
+        // Buy click upgrade
+        function buyClickUpgrade(index) {
+            const up = clickUpgrades[index];
+            const cost = Math.floor(up.baseCost * Math.pow(1.5, up.owned));
+            
+            if (treats >= cost && up.owned < up.max) {
+                treats -= cost;
+                up.owned++;
+                treatsPerClick += up.clickBonus;
+                createFloat(event.clientX, event.clientY, '+' + up.clickBonus + ' per click!', 'treat');
+                updateDisplay();
+            }
+        }
+        
+        // Create floating text
+        function createFloat(x, y, text, type) {
+            const el = document.createElement('div');
+            el.className = 'float-text ' + type;
+            el.textContent = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+        
+        // Cookie click
+        cookieEl.addEventListener('click', (e) => {
+            if (villainActive) return;
+            
+            treats += treatsPerClick;
+            totalClicks++;
+            createFloat(e.clientX, e.clientY, '+' + treatsPerClick, 'treat');
+            updateDisplay();
+        });
+        
+        // Villain attack!
+        function spawnVillain() {
+            if (villainActive) return;
+            
+            // Choose villain based on progress
+            const maxIndex = Math.min(Math.floor(villainsDefeated / 3), villains.length - 1);
+            const villainIndex = Math.floor(Math.random() * (maxIndex + 1));
+            currentVillain = villains[villainIndex];
+            
+            // Scale HP with progress
+            const scale = 1 + villainsDefeated * 0.1;
+            villainMaxHp = Math.floor(currentVillain.hp * scale);
+            villainHp = villainMaxHp;
+            
+            // Show villain
+            villainActive = true;
+            villainEmoji.textContent = currentVillain.emoji;
+            villainMessage.textContent = currentVillain.message;
+            villainHpBar.style.width = '100%';
+            villainHpText.textContent = `HP: ${villainHp}/${villainMaxHp}`;
+            
+            // Warning flash
+            warningFlash.classList.add('active');
+            setTimeout(() => warningFlash.classList.remove('active'), 500);
+            
+            villainAlert.classList.add('active');
+            cookieStatus.textContent = 'Cookie is SCARED! 😱 Defeat the villain!';
+            cookieStatus.className = 'cookie-status scared';
+            
+            // Start stealing treats
+            stealInterval = setInterval(() => {
+                const stolen = Math.floor(currentVillain.stealRate * scale);
+                if (treats > 0) {
+                    const actualStolen = Math.min(stolen, treats);
+                    treats -= actualStolen;
+                    treatsStolen += actualStolen;
+                    createFloat(
+                        window.innerWidth / 2,
+                        window.innerHeight / 2 - 50,
+                        '-' + actualStolen + ' stolen!',
+                        'damage'
+                    );
+                    updateDisplay();
+                }
+            }, 1000);
+        }
+        
+        // Attack villain
+        villainEmoji.addEventListener('click', (e) => {
+            if (!villainActive) return;
+            
+            const damage = Math.max(1, Math.floor(treatsPerClick / 2) + 1);
+            villainHp -= damage;
+            
+            createFloat(e.clientX, e.clientY, '-' + damage, 'damage');
+            
+            if (villainHp <= 0) {
+                // Victory!
+                defeatVillain();
+            } else {
+                villainHpBar.style.width = (villainHp / villainMaxHp * 100) + '%';
+                villainHpText.textContent = `HP: ${villainHp}/${villainMaxHp}`;
+            }
+        });
+        
+        function defeatVillain() {
+            clearInterval(stealInterval);
+            villainActive = false;
+            villainsDefeated++;
+            
+            // Reward
+            const reward = Math.floor(villainMaxHp * 5);
+            treats += reward;
+            
+            createFloat(
+                window.innerWidth / 2,
+                window.innerHeight / 2,
+                '+' + reward + ' REWARD!',
+                'victory'
+            );
+            
+            villainAlert.classList.remove('active');
+            cookieStatus.textContent = 'Cookie is safe! 🥰 +' + reward + ' treats!';
+            cookieStatus.className = 'cookie-status happy';
+            
+            updateDisplay();
+            
+            // Schedule next villain
+            scheduleVillain();
+        }
+        
+        function scheduleVillain() {
+            const delay = 30000 + Math.random() * 30000; // 30-60 seconds
+            villainTimer = setTimeout(spawnVillain, delay);
+        }
+        
+        // Auto treats
+        setInterval(() => {
+            treats += treatsPerSecond / 10;
+            updateDisplay();
+        }, 100);
+        
+        // Start game
+        updateDisplay();
+        scheduleVillain();
+        
+        // First villain comes faster
+        setTimeout(spawnVillain, 15000);
+    </script>
+</body>
+</html>
