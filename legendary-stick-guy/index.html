@@ -11,7 +11,7 @@
             background: linear-gradient(135deg, #1a0a0a, #2a1a1a, #1a0a1a);
             min-height: 100vh;
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         .back-btn {
             position: fixed;
@@ -26,41 +26,124 @@
             font-size: 0.9rem;
         }
         
-        /* Header Stats */
+        /* Header */
         .header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.8);
-            padding: 10px 20px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.8));
+            padding: 8px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 50;
+            border-bottom: 2px solid #333;
         }
         .title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #ff6600;
             text-shadow: 0 0 10px #ff6600;
         }
         .stats {
             display: flex;
-            gap: 20px;
-            font-size: 1rem;
+            gap: 15px;
+            font-size: 0.9rem;
         }
-        .stat { display: flex; align-items: center; gap: 5px; }
-        .stat-icon { font-size: 1.2rem; }
+        .stat { display: flex; align-items: center; gap: 4px; }
         .gold { color: #ffd700; }
         .xp { color: #00ff88; }
         .level { color: #ff00ff; }
         
-        /* Game Area */
+        /* XP Bar */
+        .xp-bar-container {
+            position: fixed;
+            top: 44px;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #222;
+            z-index: 49;
+        }
+        .xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffcc);
+            transition: width 0.3s;
+        }
+        
+        /* Main Layout */
         .game-container {
             display: flex;
             height: 100vh;
             padding-top: 50px;
         }
+        
+        /* Left Panel - Player Info */
+        .player-panel {
+            width: 220px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-right: 2px solid #333;
+            overflow-y: auto;
+        }
+        .panel-title {
+            color: #ff6600;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 4px 0;
+            border-bottom: 1px solid #222;
+        }
+        .stat-name { color: #aaa; }
+        .stat-value { color: #fff; font-weight: bold; }
+        .stat-value.damage { color: #ff4444; }
+        .stat-value.defense { color: #4488ff; }
+        .stat-value.crit { color: #ff00ff; }
+        .stat-value.speed { color: #ffff00; }
+        
+        /* Equipment Section */
+        .equipment {
+            margin-top: 15px;
+        }
+        .equip-slot {
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .equip-slot.weapon { border-left: 3px solid #ff4444; }
+        .equip-slot.armor { border-left: 3px solid #4488ff; }
+        .equip-slot.accessory { border-left: 3px solid #ffff00; }
+        
+        /* Skills Section */
+        .skills {
+            margin-top: 15px;
+        }
+        .skill-slot {
+            background: rgba(255,255,255,0.05);
+            padding: 6px 8px;
+            margin-bottom: 4px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #333;
+        }
+        .skill-slot:hover { background: rgba(255,255,255,0.15); border-color: #666; }
+        .skill-slot.locked { opacity: 0.4; cursor: not-allowed; }
+        .skill-slot.active { border-color: #ff6600; background: rgba(255,102,0,0.2); }
+        .skill-name { font-weight: bold; }
+        .skill-desc { color: #888; font-size: 0.7rem; }
+        .skill-cost { color: #00ccff; float: right; }
         
         /* Battle Arena */
         .arena {
@@ -70,53 +153,202 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            background: radial-gradient(ellipse at bottom, #2a1a1a, #0a0a0a);
         }
+        
+        /* Wave Info */
         .wave-info {
             position: absolute;
-            top: 20px;
-            font-size: 1.5rem;
-            color: #ff4444;
-            text-shadow: 0 0 10px #ff0000;
+            top: 15px;
+            display: flex;
+            gap: 30px;
+            font-size: 1.1rem;
         }
+        .wave-num { color: #ff4444; text-shadow: 0 0 10px #ff0000; }
+        .enemy-type { color: #ffaa00; }
+        
+        /* Battle Area */
         .battle-area {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: space-around;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
+            padding: 0 50px;
+            margin-bottom: 20px;
         }
         
-        /* Characters */
-        .character {
+        /* Stick Figure Drawing */
+        .stick-figure-container {
             text-align: center;
-            transition: transform 0.1s;
         }
-        .character.attacking { animation: attack 0.3s ease-out; }
-        .character.hurt { animation: hurt 0.2s ease-out; }
-        @keyframes attack { 50% { transform: translateX(30px); } }
-        @keyframes hurt { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
-        
         .stick-figure {
-            font-size: 80px;
-            line-height: 1;
+            position: relative;
+            width: 80px;
+            height: 140px;
         }
-        .enemy-figure {
-            font-size: 70px;
-            line-height: 1;
+        .stick-figure .head {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #000;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .stick-figure .body {
+            width: 4px;
+            height: 45px;
+            background: #000;
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .stick-figure .arm-left {
+            width: 4px;
+            height: 35px;
+            background: #000;
+            position: absolute;
+            top: 40px;
+            left: 15px;
+            transform: rotate(30deg);
+            transform-origin: top center;
+        }
+        .stick-figure .arm-right {
+            width: 4px;
+            height: 35px;
+            background: #000;
+            position: absolute;
+            top: 40px;
+            right: 15px;
+            transform: rotate(-30deg);
+            transform-origin: top center;
+        }
+        .stick-figure .leg-left {
+            width: 4px;
+            height: 50px;
+            background: #000;
+            position: absolute;
+            top: 78px;
+            left: 25px;
+            transform: rotate(15deg);
+            transform-origin: top center;
+        }
+        .stick-figure .leg-right {
+            width: 4px;
+            height: 50px;
+            background: #000;
+            position: absolute;
+            top: 78px;
+            right: 25px;
+            transform: rotate(-15deg);
+            transform-origin: top center;
+        }
+        /* Weapon */
+        .stick-figure .weapon {
+            position: absolute;
+            top: 35px;
+            right: -15px;
+            font-size: 30px;
+            transform: rotate(-45deg);
+        }
+        
+        /* Enemy Stick Figure */
+        .enemy-stick {
+            position: relative;
+            width: 80px;
+            height: 140px;
+        }
+        .enemy-stick .head {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #ff0000;
+            border-radius: 50%;
+            background: #ffcccc;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .enemy-stick .body {
+            width: 4px;
+            height: 45px;
+            background: #ff0000;
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .enemy-stick .arm-left, .enemy-stick .arm-right {
+            width: 4px;
+            height: 35px;
+            background: #ff0000;
+            position: absolute;
+            top: 40px;
+            transform-origin: top center;
+        }
+        .enemy-stick .arm-left { left: 15px; transform: rotate(30deg); }
+        .enemy-stick .arm-right { right: 15px; transform: rotate(-30deg); }
+        .enemy-stick .leg-left, .enemy-stick .leg-right {
+            width: 4px;
+            height: 50px;
+            background: #ff0000;
+            position: absolute;
+            top: 78px;
+            transform-origin: top center;
+        }
+        .enemy-stick .leg-left { left: 25px; transform: rotate(15deg); }
+        .enemy-stick .leg-right { right: 25px; transform: rotate(-15deg); }
+        .enemy-stick .enemy-icon {
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+        }
+        
+        /* Animations */
+        .stick-figure-container.attacking .stick-figure .arm-right {
+            animation: swing 0.3s ease-out;
+        }
+        @keyframes swing {
+            0% { transform: rotate(-30deg); }
+            50% { transform: rotate(-120deg); }
+            100% { transform: rotate(-30deg); }
+        }
+        .stick-figure-container.hurt {
+            animation: hurt 0.2s ease-out;
+        }
+        .enemy-container.hurt {
+            animation: hurt 0.2s ease-out;
+        }
+        @keyframes hurt {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        /* Character Info Under Figures */
+        .char-info {
+            text-align: center;
+            margin-top: 10px;
         }
         .char-name {
             font-size: 1rem;
-            margin-top: 5px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-        
-        /* Health Bars */
         .health-bar-container {
             width: 120px;
-            height: 15px;
+            height: 12px;
             background: #333;
-            border-radius: 10px;
-            margin-top: 10px;
+            border-radius: 6px;
             overflow: hidden;
+            margin: 0 auto;
+            border: 2px solid #555;
         }
         .health-bar {
             height: 100%;
@@ -124,56 +356,100 @@
             transition: width 0.3s;
         }
         .health-bar.enemy { background: linear-gradient(90deg, #ff0000, #ff4444); }
+        .health-bar.low { background: linear-gradient(90deg, #ff4400, #ff0000); }
         .health-text {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-top: 3px;
+            color: #aaa;
+        }
+        
+        /* Mana Bar */
+        .mana-bar-container {
+            width: 100px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px auto 0;
+            border: 1px solid #444;
+        }
+        .mana-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #0066ff, #00ccff);
+            transition: width 0.3s;
+        }
+        
+        /* Status Effects */
+        .status-effects {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            margin-top: 5px;
+            min-height: 20px;
+        }
+        .status-icon {
+            font-size: 0.9rem;
+            padding: 2px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
         }
         
         /* Action Buttons */
         .actions {
-            margin-top: 40px;
             display: flex;
-            gap: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            max-width: 500px;
         }
         .action-btn {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+            padding: 12px 20px;
+            font-size: 1rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: bold;
+            min-width: 100px;
         }
-        .attack-btn {
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            color: white;
-        }
-        .attack-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #ff0000; }
-        .heal-btn {
-            background: linear-gradient(135deg, #44ff44, #00cc00);
-            color: white;
-        }
-        .heal-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px #00ff00; }
-        .heal-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .action-btn:hover:not(:disabled) { transform: scale(1.05); }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        
+        .attack-btn { background: linear-gradient(135deg, #ff4444, #cc0000); color: white; }
+        .attack-btn:hover:not(:disabled) { box-shadow: 0 0 15px #ff0000; }
+        
+        .skill-btn { background: linear-gradient(135deg, #9944ff, #6600cc); color: white; }
+        .skill-btn:hover:not(:disabled) { box-shadow: 0 0 15px #9900ff; }
+        
+        .defend-btn { background: linear-gradient(135deg, #4488ff, #0044cc); color: white; }
+        .defend-btn:hover:not(:disabled) { box-shadow: 0 0 15px #0088ff; }
+        
+        .heal-btn { background: linear-gradient(135deg, #44ff44, #00cc00); color: white; }
+        .heal-btn:hover:not(:disabled) { box-shadow: 0 0 15px #00ff00; }
+        
+        .special-btn { background: linear-gradient(135deg, #ffaa00, #ff6600); color: white; }
+        .special-btn:hover:not(:disabled) { box-shadow: 0 0 15px #ff8800; }
         
         /* Combat Log */
         .combat-log {
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            max-width: 400px;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            max-width: 500px;
             text-align: center;
+            border: 1px solid #333;
         }
         
         /* Shop Panel */
         .shop {
-            width: 280px;
-            background: rgba(0,0,0,0.8);
+            width: 260px;
+            background: rgba(0,0,0,0.7);
             padding: 15px;
             overflow-y: auto;
             border-left: 2px solid #333;
@@ -181,69 +457,103 @@
         .shop h2 {
             text-align: center;
             color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-        .upgrade {
-            background: rgba(255,255,255,0.1);
-            padding: 12px;
             margin-bottom: 10px;
-            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+        .shop-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .shop-tab {
+            flex: 1;
+            padding: 6px;
+            font-size: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .shop-tab.active { background: #ff6600; }
+        
+        .upgrade {
+            background: rgba(255,255,255,0.08);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            border: 2px solid transparent;
+            border: 1px solid #333;
+            font-size: 0.8rem;
         }
-        .upgrade:hover { border-color: #ffd700; background: rgba(255,255,255,0.15); }
-        .upgrade.maxed { opacity: 0.5; cursor: not-allowed; border-color: #888; }
+        .upgrade:hover:not(.maxed):not(.locked) { border-color: #ffd700; background: rgba(255,255,255,0.12); }
+        .upgrade.maxed { opacity: 0.5; cursor: not-allowed; }
+        .upgrade.locked { opacity: 0.3; cursor: not-allowed; }
         .upgrade-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
-        .upgrade-name { font-weight: bold; color: #fff; }
-        .upgrade-level { color: #888; font-size: 0.85rem; }
-        .upgrade-cost { color: #ffd700; font-size: 0.9rem; }
-        .upgrade-desc { font-size: 0.8rem; color: #aaa; }
-        .upgrade-effect { font-size: 0.85rem; color: #00ff88; margin-top: 5px; }
+        .upgrade-name { font-weight: bold; }
+        .upgrade-level { color: #888; font-size: 0.75rem; }
+        .upgrade-desc { font-size: 0.7rem; color: #aaa; }
+        .upgrade-effect { font-size: 0.75rem; color: #00ff88; margin-top: 3px; }
+        .upgrade-cost { color: #ffd700; font-size: 0.8rem; margin-top: 3px; }
         
-        /* Floating Damage */
-        .float-damage {
+        /* Floating Text */
+        .float-text {
             position: fixed;
             font-weight: bold;
-            font-size: 1.5rem;
             pointer-events: none;
             animation: floatUp 1s ease-out forwards;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            z-index: 1000;
         }
-        .float-damage.player { color: #ff4444; }
-        .float-damage.enemy { color: #ffff00; }
-        .float-damage.heal { color: #00ff00; }
-        .float-damage.gold { color: #ffd700; }
-        .float-damage.xp { color: #00ff88; }
-        .float-damage.crit { font-size: 2rem; color: #ff00ff; }
+        .float-text.damage { color: #ff4444; font-size: 1.3rem; }
+        .float-text.player-damage { color: #ffff00; font-size: 1.3rem; }
+        .float-text.heal { color: #00ff00; font-size: 1.2rem; }
+        .float-text.gold { color: #ffd700; font-size: 1.1rem; }
+        .float-text.xp { color: #00ff88; font-size: 1.1rem; }
+        .float-text.crit { font-size: 1.8rem; color: #ff00ff; }
+        .float-text.miss { color: #888; font-size: 1rem; }
+        .float-text.block { color: #4488ff; font-size: 1.2rem; }
+        .float-text.mana { color: #00ccff; font-size: 1rem; }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+            100% { opacity: 0; transform: translateY(-50px) scale(0.8); }
         }
         
-        /* Level Up Effect */
-        .level-up {
+        /* Level Up */
+        .level-up-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 3rem;
-            color: #ff00ff;
-            text-shadow: 0 0 30px #ff00ff;
-            animation: levelUp 1.5s ease-out forwards;
-            pointer-events: none;
+            background: rgba(0,0,0,0.95);
+            padding: 30px 50px;
+            border-radius: 15px;
+            border: 3px solid #ff00ff;
+            text-align: center;
             z-index: 200;
+            animation: popIn 0.3s ease-out;
         }
-        @keyframes levelUp {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-            80% { opacity: 1; }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        .level-up-popup.hidden { display: none; }
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        .level-up-popup h2 { color: #ff00ff; font-size: 2rem; margin-bottom: 15px; }
+        .level-up-popup .gains { color: #00ff88; margin: 10px 0; }
+        .level-up-popup button {
+            margin-top: 15px;
+            padding: 10px 30px;
+            font-size: 1rem;
+            background: #ff00ff;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
         }
         
         /* Death Screen */
@@ -253,7 +563,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -261,17 +571,29 @@
             z-index: 300;
         }
         .death-screen.hidden { display: none; }
-        .death-screen h1 { font-size: 4rem; color: #ff0000; margin-bottom: 20px; }
-        .death-screen p { font-size: 1.5rem; margin-bottom: 30px; }
+        .death-screen h1 { font-size: 3.5rem; color: #ff0000; margin-bottom: 20px; }
+        .death-screen .final-stats { font-size: 1.2rem; margin: 10px 0; }
         .death-screen button {
+            margin-top: 25px;
             padding: 15px 40px;
             font-size: 1.3rem;
-            background: #ff6600;
+            background: linear-gradient(135deg, #ff6600, #ff3300);
             border: none;
             color: white;
             border-radius: 10px;
             cursor: pointer;
         }
+        
+        /* Combo Counter */
+        .combo-counter {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #ff6600;
+            text-shadow: 0 0 10px #ff6600;
+        }
+        .combo-counter.hidden { display: none; }
     </style>
 </head>
 <body>
@@ -280,345 +602,787 @@
     <div class="header">
         <div class="title">⚔️ Legendary Stick Guy</div>
         <div class="stats">
-            <div class="stat level"><span class="stat-icon">⭐</span> Level <span id="level">1</span></div>
-            <div class="stat xp"><span class="stat-icon">✨</span> <span id="xp">0</span>/<span id="xpNeeded">100</span> XP</div>
-            <div class="stat gold"><span class="stat-icon">💰</span> <span id="gold">0</span></div>
+            <div class="stat level">⭐ Lv.<span id="level">1</span></div>
+            <div class="stat gold">💰 <span id="gold">0</span></div>
+            <div class="stat xp">✨ <span id="xp">0</span>/<span id="xpNeeded">100</span></div>
         </div>
+    </div>
+    <div class="xp-bar-container">
+        <div class="xp-bar" id="xpBar"></div>
     </div>
     
     <div class="game-container">
+        <!-- Left Panel -->
+        <div class="player-panel">
+            <div class="panel-title">📊 Stats</div>
+            <div class="stat-row"><span class="stat-name">Damage</span><span class="stat-value damage" id="statDamage">10-15</span></div>
+            <div class="stat-row"><span class="stat-name">Defense</span><span class="stat-value defense" id="statDefense">5</span></div>
+            <div class="stat-row"><span class="stat-name">Crit Chance</span><span class="stat-value crit" id="statCrit">5%</span></div>
+            <div class="stat-row"><span class="stat-name">Crit Damage</span><span class="stat-value crit" id="statCritDmg">2.0x</span></div>
+            <div class="stat-row"><span class="stat-name">Dodge</span><span class="stat-value speed" id="statDodge">5%</span></div>
+            <div class="stat-row"><span class="stat-name">Lifesteal</span><span class="stat-value heal" id="statLifesteal">0%</span></div>
+            
+            <div class="equipment">
+                <div class="panel-title">⚔️ Equipment</div>
+                <div class="equip-slot weapon"><span id="weaponName">Wooden Sword</span><span>+5 DMG</span></div>
+                <div class="equip-slot armor"><span id="armorName">Cloth Armor</span><span>+3 DEF</span></div>
+                <div class="equip-slot accessory"><span id="accessoryName">None</span><span>-</span></div>
+            </div>
+            
+            <div class="skills">
+                <div class="panel-title">⚡ Skills</div>
+                <div class="skill-slot active" data-skill="powerStrike">
+                    <span class="skill-name">Power Strike</span>
+                    <span class="skill-cost">15 MP</span>
+                    <div class="skill-desc">Deal 2x damage</div>
+                </div>
+                <div class="skill-slot" data-skill="fireball" id="skillFireball">
+                    <span class="skill-name">🔥 Fireball</span>
+                    <span class="skill-cost">25 MP</span>
+                    <div class="skill-desc">Burn enemy (Lv.5)</div>
+                </div>
+                <div class="skill-slot locked" data-skill="whirlwind" id="skillWhirlwind">
+                    <span class="skill-name">🌀 Whirlwind</span>
+                    <span class="skill-cost">30 MP</span>
+                    <div class="skill-desc">3 hits! (Lv.10)</div>
+                </div>
+                <div class="skill-slot locked" data-skill="execute" id="skillExecute">
+                    <span class="skill-name">💀 Execute</span>
+                    <span class="skill-cost">40 MP</span>
+                    <div class="skill-desc">Huge damage if enemy &lt;30% HP (Lv.15)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Battle Arena -->
         <div class="arena">
-            <div class="wave-info">☠️ Wave <span id="wave">1</span> - <span id="enemyType">Slime</span></div>
+            <div class="wave-info">
+                <span class="wave-num">☠️ Wave <span id="wave">1</span></span>
+                <span class="enemy-type" id="enemyType">Slime</span>
+            </div>
+            
+            <div class="combo-counter hidden" id="comboCounter">🔥 x<span id="comboNum">0</span> COMBO!</div>
             
             <div class="battle-area">
-                <div class="character" id="player">
-                    <div class="stick-figure">🧍</div>
-                    <div class="char-name">Stick Guy</div>
-                    <div class="health-bar-container">
-                        <div class="health-bar" id="playerHealthBar"></div>
+                <!-- Player -->
+                <div class="stick-figure-container" id="playerContainer">
+                    <div class="stick-figure" id="playerFigure">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="arm-left"></div>
+                        <div class="arm-right"></div>
+                        <div class="leg-left"></div>
+                        <div class="leg-right"></div>
+                        <div class="weapon" id="playerWeapon">⚔️</div>
                     </div>
-                    <div class="health-text"><span id="playerHp">100</span>/<span id="playerMaxHp">100</span> HP</div>
+                    <div class="char-info">
+                        <div class="char-name">Stick Guy</div>
+                        <div class="health-bar-container">
+                            <div class="health-bar" id="playerHealthBar"></div>
+                        </div>
+                        <div class="health-text"><span id="playerHp">100</span>/<span id="playerMaxHp">100</span> HP</div>
+                        <div class="mana-bar-container">
+                            <div class="mana-bar" id="playerManaBar"></div>
+                        </div>
+                        <div class="health-text" style="color:#00ccff;"><span id="playerMp">50</span>/<span id="playerMaxMp">50</span> MP</div>
+                        <div class="status-effects" id="playerStatus"></div>
+                    </div>
                 </div>
                 
-                <div class="character" id="enemy">
-                    <div class="enemy-figure" id="enemySprite">🟢</div>
-                    <div class="char-name" id="enemyName">Slime</div>
-                    <div class="health-bar-container">
-                        <div class="health-bar enemy" id="enemyHealthBar"></div>
+                <!-- Enemy -->
+                <div class="stick-figure-container enemy-container" id="enemyContainer">
+                    <div class="enemy-stick" id="enemyFigure">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="arm-left"></div>
+                        <div class="arm-right"></div>
+                        <div class="leg-left"></div>
+                        <div class="leg-right"></div>
+                        <div class="enemy-icon" id="enemyIcon">🟢</div>
                     </div>
-                    <div class="health-text"><span id="enemyHp">50</span>/<span id="enemyMaxHp">50</span> HP</div>
+                    <div class="char-info">
+                        <div class="char-name" id="enemyName">Slime</div>
+                        <div class="health-bar-container">
+                            <div class="health-bar enemy" id="enemyHealthBar"></div>
+                        </div>
+                        <div class="health-text"><span id="enemyHp">50</span>/<span id="enemyMaxHp">50</span> HP</div>
+                        <div class="status-effects" id="enemyStatus"></div>
+                    </div>
                 </div>
             </div>
             
             <div class="actions">
-                <button class="action-btn attack-btn" id="attackBtn">⚔️ ATTACK</button>
-                <button class="action-btn heal-btn" id="healBtn">💚 HEAL (3)</button>
+                <button class="action-btn attack-btn" id="attackBtn">⚔️ Attack</button>
+                <button class="action-btn skill-btn" id="skillBtn">⚡ Skill</button>
+                <button class="action-btn defend-btn" id="defendBtn">🛡️ Defend</button>
+                <button class="action-btn heal-btn" id="healBtn">💚 Heal</button>
+                <button class="action-btn special-btn" id="specialBtn" disabled>💥 Ultimate</button>
             </div>
             
-            <div class="combat-log" id="combatLog">Click ATTACK to fight!</div>
+            <div class="combat-log" id="combatLog">Choose your action!</div>
         </div>
         
+        <!-- Shop -->
         <div class="shop">
-            <h2>🛒 Upgrades</h2>
-            <div id="upgradeList"></div>
+            <h2>🛒 Shop</h2>
+            <div class="shop-tabs">
+                <button class="shop-tab active" data-tab="stats">Stats</button>
+                <button class="shop-tab" data-tab="weapons">Weapons</button>
+                <button class="shop-tab" data-tab="armor">Armor</button>
+            </div>
+            <div id="shopContent"></div>
         </div>
     </div>
     
+    <!-- Level Up Popup -->
+    <div class="level-up-popup hidden" id="levelUpPopup">
+        <h2>⭐ LEVEL UP! ⭐</h2>
+        <div>You are now Level <span id="newLevel">2</span>!</div>
+        <div class="gains" id="levelGains"></div>
+        <button id="closeLevelUp">Continue</button>
+    </div>
+    
+    <!-- Death Screen -->
     <div class="death-screen hidden" id="deathScreen">
-        <h1>💀 YOU DIED</h1>
-        <p>You reached Wave <span id="finalWave">1</span>!</p>
-        <p>Total Gold Earned: <span id="finalGold">0</span> 💰</p>
-        <button id="restartBtn">⚔️ Fight Again</button>
+        <h1>💀 DEFEATED</h1>
+        <div class="final-stats">Reached Wave <span id="finalWave">1</span></div>
+        <div class="final-stats">Level <span id="finalLevel">1</span></div>
+        <div class="final-stats">Gold Earned: <span id="finalGold">0</span> 💰</div>
+        <div class="final-stats">Enemies Slain: <span id="finalKills">0</span></div>
+        <button id="restartBtn">⚔️ Try Again</button>
     </div>
     
     <script>
-        // Player Stats
+        // === GAME STATE ===
         let player = {
-            level: 1,
-            xp: 0,
-            xpNeeded: 100,
-            gold: 0,
-            totalGold: 0,
-            hp: 100,
-            maxHp: 100,
-            damage: 10,
-            critChance: 5,
-            critMultiplier: 2,
-            healAmount: 30,
-            healCharges: 3,
-            maxHealCharges: 3
+            level: 1, xp: 0, xpNeeded: 100,
+            gold: 0, totalGold: 0, kills: 0,
+            hp: 100, maxHp: 100,
+            mp: 50, maxMp: 50,
+            baseDamage: 10, damageRange: 5,
+            defense: 5,
+            critChance: 5, critMultiplier: 2.0,
+            dodge: 5, lifesteal: 0,
+            healCharges: 3, maxHealCharges: 3, healAmount: 30,
+            isDefending: false,
+            combo: 0, ultimateCharge: 0,
+            statusEffects: [],
+            weapon: { name: 'Wooden Sword', damage: 5, icon: '⚔️' },
+            armor: { name: 'Cloth Armor', defense: 3 },
+            accessory: null
         };
         
-        // Upgrades
-        const upgrades = [
-            { name: '⚔️ Sharper Sword', desc: 'Increase damage', effect: () => `+${5 + player.level * 2} damage`, stat: 'damage', increase: () => 5 + player.level * 2, baseCost: 50, level: 0, maxLevel: 20 },
-            { name: '❤️ Vitality', desc: 'Increase max HP', effect: () => `+${20 + player.level * 5} max HP`, stat: 'maxHp', increase: () => 20 + player.level * 5, baseCost: 40, level: 0, maxLevel: 20 },
-            { name: '🎯 Critical Eye', desc: 'Increase crit chance', effect: () => `+5% crit chance`, stat: 'critChance', increase: () => 5, baseCost: 80, level: 0, maxLevel: 15 },
-            { name: '💥 Critical Power', desc: 'Increase crit damage', effect: () => `+0.5x crit multiplier`, stat: 'critMultiplier', increase: () => 0.5, baseCost: 100, level: 0, maxLevel: 10 },
-            { name: '💚 Better Potions', desc: 'Heal more per use', effect: () => `+15 heal amount`, stat: 'healAmount', increase: () => 15, baseCost: 60, level: 0, maxLevel: 15 },
-            { name: '🧪 More Potions', desc: 'Extra heal charges', effect: () => `+1 heal charge`, stat: 'maxHealCharges', increase: () => 1, baseCost: 120, level: 0, maxLevel: 5 }
-        ];
-        
-        // Enemies
-        const enemyTypes = [
-            { name: 'Slime', sprite: '🟢', baseHp: 50, baseDamage: 5 },
-            { name: 'Goblin', sprite: '👺', baseHp: 80, baseDamage: 8 },
-            { name: 'Skeleton', sprite: '💀', baseHp: 100, baseDamage: 12 },
-            { name: 'Orc', sprite: '👹', baseHp: 150, baseDamage: 15 },
-            { name: 'Dark Knight', sprite: '🖤', baseHp: 200, baseDamage: 20 },
-            { name: 'Demon', sprite: '😈', baseHp: 300, baseDamage: 25 },
-            { name: 'Dragon', sprite: '🐉', baseHp: 500, baseDamage: 35 },
-            { name: 'Death Lord', sprite: '☠️', baseHp: 750, baseDamage: 50 },
-            { name: 'Ancient Evil', sprite: '👁️', baseHp: 1000, baseDamage: 70 },
-            { name: 'THE FINAL BOSS', sprite: '🔥', baseHp: 2000, baseDamage: 100 }
-        ];
+        let enemy = {
+            name: 'Slime', icon: '🟢',
+            hp: 50, maxHp: 50,
+            damage: 5, damageRange: 3,
+            defense: 0,
+            statusEffects: []
+        };
         
         let wave = 1;
-        let enemy = { hp: 50, maxHp: 50, damage: 5 };
-        let currentEnemyType = enemyTypes[0];
+        let selectedSkill = 'powerStrike';
+        let currentShopTab = 'stats';
+        let isPlayerTurn = true;
         
-        // DOM Elements
-        const playerEl = document.getElementById('player');
-        const enemyEl = document.getElementById('enemy');
-        const attackBtn = document.getElementById('attackBtn');
-        const healBtn = document.getElementById('healBtn');
-        const combatLog = document.getElementById('combatLog');
-        const deathScreen = document.getElementById('deathScreen');
+        // === ENEMY TYPES ===
+        const enemyTypes = [
+            { name: 'Slime', icon: '🟢', hp: 50, damage: 5, defense: 0, xp: 20, gold: 10 },
+            { name: 'Goblin', icon: '👺', hp: 80, damage: 8, defense: 2, xp: 35, gold: 18 },
+            { name: 'Skeleton', icon: '💀', hp: 100, damage: 12, defense: 5, xp: 50, gold: 25 },
+            { name: 'Orc', icon: '👹', hp: 150, damage: 18, defense: 8, xp: 75, gold: 40 },
+            { name: 'Dark Knight', icon: '🖤', hp: 200, damage: 25, defense: 15, xp: 100, gold: 60 },
+            { name: 'Demon', icon: '😈', hp: 300, damage: 35, defense: 20, xp: 150, gold: 90 },
+            { name: 'Dragon', icon: '🐉', hp: 500, damage: 50, defense: 30, xp: 250, gold: 150 },
+            { name: 'Death Lord', icon: '☠️', hp: 750, damage: 70, defense: 40, xp: 400, gold: 250 },
+            { name: 'Ancient Evil', icon: '👁️', hp: 1000, damage: 90, defense: 50, xp: 600, gold: 400 },
+            { name: 'FINAL BOSS', icon: '🔥', hp: 2000, damage: 120, defense: 60, xp: 1000, gold: 1000 }
+        ];
         
+        // === SHOP DATA ===
+        const statUpgrades = [
+            { id: 'damage', name: '⚔️ Attack Power', desc: 'Increase base damage', effect: () => `+3 damage`, apply: () => { player.baseDamage += 3; }, cost: 50, level: 0, max: 25 },
+            { id: 'hp', name: '❤️ Vitality', desc: 'Increase max HP', effect: () => `+25 max HP`, apply: () => { player.maxHp += 25; player.hp += 25; }, cost: 40, level: 0, max: 25 },
+            { id: 'mp', name: '💙 Mana Pool', desc: 'Increase max MP', effect: () => `+15 max MP`, apply: () => { player.maxMp += 15; player.mp += 15; }, cost: 35, level: 0, max: 20 },
+            { id: 'defense', name: '🛡️ Toughness', desc: 'Increase defense', effect: () => `+3 defense`, apply: () => { player.defense += 3; }, cost: 45, level: 0, max: 20 },
+            { id: 'crit', name: '🎯 Critical Eye', desc: 'Increase crit chance', effect: () => `+3% crit`, apply: () => { player.critChance += 3; }, cost: 60, level: 0, max: 15 },
+            { id: 'critdmg', name: '💥 Critical Power', desc: 'Increase crit damage', effect: () => `+0.3x crit multiplier`, apply: () => { player.critMultiplier += 0.3; }, cost: 80, level: 0, max: 10 },
+            { id: 'dodge', name: '💨 Agility', desc: 'Increase dodge chance', effect: () => `+2% dodge`, apply: () => { player.dodge += 2; }, cost: 70, level: 0, max: 15 },
+            { id: 'lifesteal', name: '🧛 Lifesteal', desc: 'Heal on hit', effect: () => `+2% lifesteal`, apply: () => { player.lifesteal += 2; }, cost: 100, level: 0, max: 10 },
+            { id: 'heal', name: '💚 Healing Power', desc: 'Better heals', effect: () => `+10 heal amount`, apply: () => { player.healAmount += 10; }, cost: 50, level: 0, max: 15 },
+            { id: 'healcharges', name: '🧪 Potion Belt', desc: 'More heal uses', effect: () => `+1 heal charge`, apply: () => { player.maxHealCharges += 1; player.healCharges += 1; }, cost: 120, level: 0, max: 5 }
+        ];
+        
+        const weapons = [
+            { name: 'Iron Sword', damage: 10, icon: '🗡️', cost: 100 },
+            { name: 'Steel Blade', damage: 18, icon: '⚔️', cost: 300 },
+            { name: 'War Axe', damage: 28, icon: '🪓', cost: 600 },
+            { name: 'Flame Sword', damage: 40, icon: '🔥', cost: 1200 },
+            { name: 'Dragon Slayer', damage: 60, icon: '🐉', cost: 2500 },
+            { name: 'Legendary Blade', damage: 100, icon: '✨', cost: 5000 }
+        ];
+        
+        const armors = [
+            { name: 'Leather Armor', defense: 8, cost: 80 },
+            { name: 'Chain Mail', defense: 15, cost: 250 },
+            { name: 'Steel Plate', defense: 25, cost: 500 },
+            { name: 'Dragon Scale', defense: 40, cost: 1000 },
+            { name: 'Legendary Armor', defense: 60, cost: 3000 }
+        ];
+        
+        // === DOM ELEMENTS ===
+        const $ = id => document.getElementById(id);
+        
+        // === DISPLAY FUNCTIONS ===
         function updateDisplay() {
-            document.getElementById('level').textContent = player.level;
-            document.getElementById('xp').textContent = player.xp;
-            document.getElementById('xpNeeded').textContent = player.xpNeeded;
-            document.getElementById('gold').textContent = player.gold;
+            $('level').textContent = player.level;
+            $('gold').textContent = player.gold;
+            $('xp').textContent = player.xp;
+            $('xpNeeded').textContent = player.xpNeeded;
+            $('xpBar').style.width = (player.xp / player.xpNeeded * 100) + '%';
             
-            document.getElementById('playerHp').textContent = Math.max(0, Math.floor(player.hp));
-            document.getElementById('playerMaxHp').textContent = player.maxHp;
-            document.getElementById('playerHealthBar').style.width = (player.hp / player.maxHp * 100) + '%';
+            $('playerHp').textContent = Math.max(0, Math.floor(player.hp));
+            $('playerMaxHp').textContent = player.maxHp;
+            $('playerHealthBar').style.width = (player.hp / player.maxHp * 100) + '%';
+            $('playerHealthBar').className = 'health-bar' + (player.hp < player.maxHp * 0.3 ? ' low' : '');
             
-            document.getElementById('enemyHp').textContent = Math.max(0, Math.floor(enemy.hp));
-            document.getElementById('enemyMaxHp').textContent = enemy.maxHp;
-            document.getElementById('enemyHealthBar').style.width = (enemy.hp / enemy.maxHp * 100) + '%';
+            $('playerMp').textContent = Math.max(0, Math.floor(player.mp));
+            $('playerMaxMp').textContent = player.maxMp;
+            $('playerManaBar').style.width = (player.mp / player.maxMp * 100) + '%';
             
-            document.getElementById('wave').textContent = wave;
-            document.getElementById('enemyType').textContent = currentEnemyType.name;
-            document.getElementById('enemyName').textContent = currentEnemyType.name;
-            document.getElementById('enemySprite').textContent = currentEnemyType.sprite;
+            $('enemyHp').textContent = Math.max(0, Math.floor(enemy.hp));
+            $('enemyMaxHp').textContent = enemy.maxHp;
+            $('enemyHealthBar').style.width = (enemy.hp / enemy.maxHp * 100) + '%';
+            $('enemyName').textContent = enemy.name;
+            $('enemyIcon').textContent = enemy.icon;
+            $('enemyType').textContent = enemy.name;
+            $('wave').textContent = wave;
             
-            healBtn.textContent = `💚 HEAL (${player.healCharges})`;
-            healBtn.disabled = player.healCharges <= 0 || player.hp >= player.maxHp;
+            // Stats panel
+            const totalDamage = player.baseDamage + player.weapon.damage;
+            $('statDamage').textContent = `${totalDamage}-${totalDamage + player.damageRange}`;
+            $('statDefense').textContent = player.defense + player.armor.defense;
+            $('statCrit').textContent = player.critChance + '%';
+            $('statCritDmg').textContent = player.critMultiplier.toFixed(1) + 'x';
+            $('statDodge').textContent = player.dodge + '%';
+            $('statLifesteal').textContent = player.lifesteal + '%';
             
-            renderUpgrades();
+            // Equipment
+            $('weaponName').textContent = player.weapon.name;
+            $('armorName').textContent = player.armor.name;
+            $('playerWeapon').textContent = player.weapon.icon;
+            
+            // Heal button
+            $('healBtn').textContent = `💚 Heal (${player.healCharges})`;
+            $('healBtn').disabled = player.healCharges <= 0 || player.hp >= player.maxHp || !isPlayerTurn;
+            
+            // Skill buttons
+            $('skillBtn').disabled = !isPlayerTurn;
+            $('attackBtn').disabled = !isPlayerTurn;
+            $('defendBtn').disabled = !isPlayerTurn;
+            
+            // Ultimate
+            $('specialBtn').disabled = player.ultimateCharge < 100 || !isPlayerTurn;
+            $('specialBtn').textContent = player.ultimateCharge >= 100 ? '💥 Ultimate!' : `💥 ${player.ultimateCharge}%`;
+            
+            // Combo
+            if (player.combo > 1) {
+                $('comboCounter').classList.remove('hidden');
+                $('comboNum').textContent = player.combo;
+            } else {
+                $('comboCounter').classList.add('hidden');
+            }
+            
+            // Unlock skills based on level
+            $('skillFireball').classList.toggle('locked', player.level < 5);
+            $('skillWhirlwind').classList.toggle('locked', player.level < 10);
+            $('skillExecute').classList.toggle('locked', player.level < 15);
+            
+            renderShop();
         }
         
-        function renderUpgrades() {
-            const list = document.getElementById('upgradeList');
-            list.innerHTML = '';
+        function renderShop() {
+            const content = $('shopContent');
+            content.innerHTML = '';
             
-            upgrades.forEach((up, index) => {
-                const cost = Math.floor(up.baseCost * Math.pow(1.5, up.level));
-                const maxed = up.level >= up.maxLevel;
-                
-                const div = document.createElement('div');
-                div.className = 'upgrade' + (maxed ? ' maxed' : '');
-                div.innerHTML = `
-                    <div class="upgrade-header">
-                        <span class="upgrade-name">${up.name}</span>
-                        <span class="upgrade-level">Lv ${up.level}/${up.maxLevel}</span>
-                    </div>
-                    <div class="upgrade-desc">${up.desc}</div>
-                    <div class="upgrade-effect">${up.effect()}</div>
-                    <div class="upgrade-cost">${maxed ? 'MAXED' : `Cost: ${cost} 💰`}</div>
-                `;
-                
-                if (!maxed && player.gold >= cost) {
-                    div.addEventListener('click', () => buyUpgrade(index));
-                }
-                
-                list.appendChild(div);
-            });
+            if (currentShopTab === 'stats') {
+                statUpgrades.forEach(up => {
+                    const cost = Math.floor(up.cost * Math.pow(1.4, up.level));
+                    const maxed = up.level >= up.max;
+                    const canAfford = player.gold >= cost;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'upgrade' + (maxed ? ' maxed' : '') + (!canAfford && !maxed ? ' locked' : '');
+                    div.innerHTML = `
+                        <div class="upgrade-header">
+                            <span class="upgrade-name">${up.name}</span>
+                            <span class="upgrade-level">${up.level}/${up.max}</span>
+                        </div>
+                        <div class="upgrade-desc">${up.desc}</div>
+                        <div class="upgrade-effect">${up.effect()}</div>
+                        <div class="upgrade-cost">${maxed ? 'MAXED' : `${cost} 💰`}</div>
+                    `;
+                    if (!maxed && canAfford) {
+                        div.onclick = () => buyStatUpgrade(up, cost);
+                    }
+                    content.appendChild(div);
+                });
+            } else if (currentShopTab === 'weapons') {
+                weapons.forEach(w => {
+                    const owned = player.weapon.name === w.name;
+                    const canAfford = player.gold >= w.cost;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'upgrade' + (owned ? ' maxed' : '') + (!canAfford && !owned ? ' locked' : '');
+                    div.innerHTML = `
+                        <div class="upgrade-name">${w.icon} ${w.name}</div>
+                        <div class="upgrade-effect">+${w.damage} damage</div>
+                        <div class="upgrade-cost">${owned ? 'EQUIPPED' : `${w.cost} 💰`}</div>
+                    `;
+                    if (!owned && canAfford) {
+                        div.onclick = () => buyWeapon(w);
+                    }
+                    content.appendChild(div);
+                });
+            } else if (currentShopTab === 'armor') {
+                armors.forEach(a => {
+                    const owned = player.armor.name === a.name;
+                    const canAfford = player.gold >= a.cost;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'upgrade' + (owned ? ' maxed' : '') + (!canAfford && !owned ? ' locked' : '');
+                    div.innerHTML = `
+                        <div class="upgrade-name">🛡️ ${a.name}</div>
+                        <div class="upgrade-effect">+${a.defense} defense</div>
+                        <div class="upgrade-cost">${owned ? 'EQUIPPED' : `${a.cost} 💰`}</div>
+                    `;
+                    if (!owned && canAfford) {
+                        div.onclick = () => buyArmor(a);
+                    }
+                    content.appendChild(div);
+                });
+            }
         }
         
-        function buyUpgrade(index) {
-            const up = upgrades[index];
-            const cost = Math.floor(up.baseCost * Math.pow(1.5, up.level));
-            
-            if (player.gold >= cost && up.level < up.maxLevel) {
+        // === SHOP FUNCTIONS ===
+        function buyStatUpgrade(up, cost) {
+            if (player.gold >= cost && up.level < up.max) {
                 player.gold -= cost;
                 up.level++;
-                player[up.stat] += up.increase();
-                
-                if (up.stat === 'maxHp') {
-                    player.hp = Math.min(player.hp + up.increase(), player.maxHp);
-                }
-                if (up.stat === 'maxHealCharges') {
-                    player.healCharges = player.maxHealCharges;
-                }
-                
-                createFloatText(event.clientX, event.clientY, up.name + ' upgraded!', 'xp');
+                up.apply();
+                createFloat($('shopContent'), up.name + ' ↑', 'xp');
                 updateDisplay();
             }
         }
         
-        function createFloatText(x, y, text, type) {
-            const el = document.createElement('div');
-            el.className = 'float-damage ' + type;
-            el.textContent = text;
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
+        function buyWeapon(w) {
+            if (player.gold >= w.cost) {
+                player.gold -= w.cost;
+                player.weapon = { ...w };
+                createFloat($('shopContent'), 'New weapon!', 'gold');
+                updateDisplay();
+            }
         }
         
-        function attack() {
-            // Player attacks
-            let damage = player.damage;
-            let isCrit = Math.random() * 100 < player.critChance;
+        function buyArmor(a) {
+            if (player.gold >= a.cost) {
+                player.gold -= a.cost;
+                player.armor = { ...a };
+                createFloat($('shopContent'), 'New armor!', 'gold');
+                updateDisplay();
+            }
+        }
+        
+        // === COMBAT ===
+        function createFloat(el, text, type) {
+            const rect = el.getBoundingClientRect();
+            const float = document.createElement('div');
+            float.className = 'float-text ' + type;
+            float.textContent = text;
+            float.style.left = (rect.left + rect.width/2) + 'px';
+            float.style.top = rect.top + 'px';
+            document.body.appendChild(float);
+            setTimeout(() => float.remove(), 1000);
+        }
+        
+        function calculateDamage(attacker, isPlayer) {
+            const base = isPlayer ? player.baseDamage + player.weapon.damage : enemy.damage;
+            const range = isPlayer ? player.damageRange : enemy.damageRange || 3;
+            let damage = base + Math.floor(Math.random() * range);
             
-            if (isCrit) {
+            let isCrit = false;
+            if (isPlayer && Math.random() * 100 < player.critChance) {
                 damage = Math.floor(damage * player.critMultiplier);
+                isCrit = true;
             }
             
-            enemy.hp -= damage;
-            playerEl.classList.add('attacking');
-            setTimeout(() => playerEl.classList.remove('attacking'), 300);
+            return { damage, isCrit };
+        }
+        
+        function applyDamage(target, damage, isEnemy) {
+            const defense = isEnemy ? enemy.defense : (player.defense + player.armor.defense);
+            const reduced = Math.max(1, damage - defense * 0.5);
             
-            const enemyRect = enemyEl.getBoundingClientRect();
-            createFloatText(enemyRect.left + 50, enemyRect.top, '-' + damage, isCrit ? 'crit' : 'enemy');
+            if (isEnemy) {
+                enemy.hp -= reduced;
+            } else {
+                if (player.isDefending) {
+                    reduced *= 0.5;
+                }
+                if (Math.random() * 100 < player.dodge) {
+                    return { dodged: true, damage: 0 };
+                }
+                player.hp -= reduced;
+            }
+            return { dodged: false, damage: Math.floor(reduced) };
+        }
+        
+        function playerAttack() {
+            if (!isPlayerTurn) return;
+            isPlayerTurn = false;
+            player.isDefending = false;
             
-            combatLog.textContent = isCrit ? `💥 CRITICAL HIT! You deal ${damage} damage!` : `You deal ${damage} damage!`;
+            const { damage, isCrit } = calculateDamage(player, true);
+            const result = applyDamage(null, damage, true);
+            
+            $('playerContainer').classList.add('attacking');
+            setTimeout(() => $('playerContainer').classList.remove('attacking'), 300);
+            
+            $('enemyContainer').classList.add('hurt');
+            setTimeout(() => $('enemyContainer').classList.remove('hurt'), 200);
+            
+            createFloat($('enemyContainer'), '-' + result.damage, isCrit ? 'crit' : 'player-damage');
+            
+            if (isCrit) {
+                $('combatLog').textContent = `💥 CRITICAL! You deal ${result.damage} damage!`;
+            } else {
+                $('combatLog').textContent = `You deal ${result.damage} damage!`;
+            }
+            
+            // Lifesteal
+            if (player.lifesteal > 0) {
+                const heal = Math.floor(result.damage * player.lifesteal / 100);
+                if (heal > 0) {
+                    player.hp = Math.min(player.maxHp, player.hp + heal);
+                    createFloat($('playerContainer'), '+' + heal, 'heal');
+                }
+            }
+            
+            // Combo & Ultimate
+            player.combo++;
+            player.ultimateCharge = Math.min(100, player.ultimateCharge + 10);
+            
+            // Mana regen
+            player.mp = Math.min(player.maxMp, player.mp + 5);
             
             updateDisplay();
             
             if (enemy.hp <= 0) {
                 enemyDefeated();
+            } else {
+                setTimeout(enemyTurn, 800);
+            }
+        }
+        
+        function useSkill() {
+            if (!isPlayerTurn) return;
+            
+            const skillCosts = { powerStrike: 15, fireball: 25, whirlwind: 30, execute: 40 };
+            const cost = skillCosts[selectedSkill];
+            
+            if (player.mp < cost) {
+                $('combatLog').textContent = 'Not enough mana!';
+                createFloat($('playerContainer'), 'No MP!', 'mana');
                 return;
             }
             
-            // Enemy attacks back
+            isPlayerTurn = false;
+            player.isDefending = false;
+            player.mp -= cost;
+            
+            $('playerContainer').classList.add('attacking');
+            setTimeout(() => $('playerContainer').classList.remove('attacking'), 300);
+            
+            let totalDamage = 0;
+            
+            if (selectedSkill === 'powerStrike') {
+                const { damage, isCrit } = calculateDamage(player, true);
+                const boosted = damage * 2;
+                applyDamage(null, boosted, true);
+                totalDamage = boosted;
+                createFloat($('enemyContainer'), '-' + Math.floor(boosted), isCrit ? 'crit' : 'player-damage');
+                $('combatLog').textContent = `⚡ Power Strike! ${Math.floor(boosted)} damage!`;
+            } else if (selectedSkill === 'fireball') {
+                const { damage } = calculateDamage(player, true);
+                const boosted = damage * 1.5;
+                applyDamage(null, boosted, true);
+                totalDamage = boosted;
+                createFloat($('enemyContainer'), '-' + Math.floor(boosted) + ' 🔥', 'player-damage');
+                $('combatLog').textContent = `🔥 Fireball! ${Math.floor(boosted)} damage + burn!`;
+            } else if (selectedSkill === 'whirlwind') {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const { damage } = calculateDamage(player, true);
+                        applyDamage(null, damage * 0.6, true);
+                        totalDamage += damage * 0.6;
+                        createFloat($('enemyContainer'), '-' + Math.floor(damage * 0.6), 'player-damage');
+                        updateDisplay();
+                    }, i * 200);
+                }
+                $('combatLog').textContent = `🌀 Whirlwind! 3 hits!`;
+            } else if (selectedSkill === 'execute') {
+                let multiplier = enemy.hp < enemy.maxHp * 0.3 ? 4 : 1.5;
+                const { damage } = calculateDamage(player, true);
+                const boosted = damage * multiplier;
+                applyDamage(null, boosted, true);
+                totalDamage = boosted;
+                createFloat($('enemyContainer'), '-' + Math.floor(boosted) + ' 💀', multiplier > 2 ? 'crit' : 'player-damage');
+                $('combatLog').textContent = multiplier > 2 ? `💀 EXECUTE! ${Math.floor(boosted)} damage!` : `💀 Execute: ${Math.floor(boosted)} damage`;
+            }
+            
+            player.combo++;
+            player.ultimateCharge = Math.min(100, player.ultimateCharge + 15);
+            
+            updateDisplay();
+            
             setTimeout(() => {
-                enemyAttack();
-            }, 500);
+                if (enemy.hp <= 0) {
+                    enemyDefeated();
+                } else {
+                    setTimeout(enemyTurn, 500);
+                }
+            }, selectedSkill === 'whirlwind' ? 700 : 100);
         }
         
-        function enemyAttack() {
-            const damage = enemy.damage + Math.floor(Math.random() * 5);
-            player.hp -= damage;
+        function defend() {
+            if (!isPlayerTurn) return;
+            isPlayerTurn = false;
+            player.isDefending = true;
             
-            enemyEl.classList.add('attacking');
-            setTimeout(() => enemyEl.classList.remove('attacking'), 300);
+            // Recover some MP
+            player.mp = Math.min(player.maxMp, player.mp + 15);
+            createFloat($('playerContainer'), '+15 MP', 'mana');
             
-            playerEl.classList.add('hurt');
-            setTimeout(() => playerEl.classList.remove('hurt'), 200);
+            $('combatLog').textContent = '🛡️ Defending! Damage reduced & MP restored.';
+            updateDisplay();
             
-            const playerRect = playerEl.getBoundingClientRect();
-            createFloatText(playerRect.left + 50, playerRect.top, '-' + damage, 'player');
+            setTimeout(enemyTurn, 800);
+        }
+        
+        function heal() {
+            if (!isPlayerTurn || player.healCharges <= 0 || player.hp >= player.maxHp) return;
+            isPlayerTurn = false;
+            player.isDefending = false;
             
-            combatLog.textContent = `${currentEnemyType.name} deals ${damage} damage to you!`;
+            player.healCharges--;
+            const healed = Math.min(player.healAmount, player.maxHp - player.hp);
+            player.hp += healed;
             
+            createFloat($('playerContainer'), '+' + healed, 'heal');
+            $('combatLog').textContent = `💚 Healed for ${healed} HP!`;
+            
+            updateDisplay();
+            setTimeout(enemyTurn, 800);
+        }
+        
+        function useUltimate() {
+            if (!isPlayerTurn || player.ultimateCharge < 100) return;
+            isPlayerTurn = false;
+            player.ultimateCharge = 0;
+            player.isDefending = false;
+            
+            const { damage } = calculateDamage(player, true);
+            const ultDamage = damage * 5;
+            applyDamage(null, ultDamage, true);
+            
+            $('playerContainer').classList.add('attacking');
+            setTimeout(() => $('playerContainer').classList.remove('attacking'), 300);
+            
+            createFloat($('enemyContainer'), '-' + Math.floor(ultDamage) + ' 💥', 'crit');
+            $('combatLog').textContent = `💥 ULTIMATE ATTACK! ${Math.floor(ultDamage)} DAMAGE!`;
+            
+            updateDisplay();
+            
+            if (enemy.hp <= 0) {
+                enemyDefeated();
+            } else {
+                setTimeout(enemyTurn, 800);
+            }
+        }
+        
+        function enemyTurn() {
+            const { damage } = calculateDamage(enemy, false);
+            const result = applyDamage(player, damage, false);
+            
+            $('enemyContainer').classList.add('attacking');
+            setTimeout(() => $('enemyContainer').classList.remove('attacking'), 300);
+            
+            if (result.dodged) {
+                createFloat($('playerContainer'), 'DODGE!', 'miss');
+                $('combatLog').textContent = `${enemy.name} attacks but you dodged!`;
+            } else {
+                $('playerContainer').classList.add('hurt');
+                setTimeout(() => $('playerContainer').classList.remove('hurt'), 200);
+                
+                const actualDamage = player.isDefending ? Math.floor(result.damage * 0.5) : result.damage;
+                createFloat($('playerContainer'), '-' + actualDamage, 'damage');
+                $('combatLog').textContent = `${enemy.name} deals ${actualDamage} damage!` + (player.isDefending ? ' (blocked!)' : '');
+                
+                player.combo = 0; // Reset combo when hit
+            }
+            
+            player.isDefending = false;
             updateDisplay();
             
             if (player.hp <= 0) {
                 gameOver();
-            }
-        }
-        
-        function heal() {
-            if (player.healCharges > 0 && player.hp < player.maxHp) {
-                player.healCharges--;
-                const healed = Math.min(player.healAmount, player.maxHp - player.hp);
-                player.hp += healed;
-                
-                const playerRect = playerEl.getBoundingClientRect();
-                createFloatText(playerRect.left + 50, playerRect.top, '+' + healed, 'heal');
-                
-                combatLog.textContent = `You heal for ${healed} HP!`;
+            } else {
+                isPlayerTurn = true;
                 updateDisplay();
             }
         }
         
         function enemyDefeated() {
-            // Rewards
-            const goldReward = 10 + wave * 5 + Math.floor(Math.random() * wave * 3);
-            const xpReward = 20 + wave * 10;
+            const typeIndex = Math.min(Math.floor((wave - 1) / 3), enemyTypes.length - 1);
+            const baseEnemy = enemyTypes[typeIndex];
+            
+            const goldReward = baseEnemy.gold + Math.floor(Math.random() * baseEnemy.gold * 0.5);
+            const xpReward = baseEnemy.xp;
             
             player.gold += goldReward;
             player.totalGold += goldReward;
             player.xp += xpReward;
+            player.kills++;
             
-            const enemyRect = enemyEl.getBoundingClientRect();
-            createFloatText(enemyRect.left + 30, enemyRect.top - 20, '+' + goldReward + ' 💰', 'gold');
-            setTimeout(() => {
-                createFloatText(enemyRect.left + 70, enemyRect.top - 20, '+' + xpReward + ' XP', 'xp');
-            }, 200);
+            createFloat($('enemyContainer'), '+' + goldReward + ' 💰', 'gold');
+            setTimeout(() => createFloat($('enemyContainer'), '+' + xpReward + ' XP', 'xp'), 200);
             
-            combatLog.textContent = `${currentEnemyType.name} defeated! +${goldReward} gold, +${xpReward} XP`;
+            $('combatLog').textContent = `${enemy.name} defeated! +${goldReward} gold, +${xpReward} XP`;
             
             // Check level up
+            checkLevelUp();
+            
+            wave++;
+            setTimeout(spawnEnemy, 1000);
+        }
+        
+        function checkLevelUp() {
             while (player.xp >= player.xpNeeded) {
                 player.xp -= player.xpNeeded;
                 player.level++;
-                player.xpNeeded = Math.floor(100 * Math.pow(1.3, player.level - 1));
-                player.maxHp += 10;
+                player.xpNeeded = Math.floor(100 * Math.pow(1.25, player.level - 1));
+                
+                // Level up bonuses
+                player.maxHp += 15;
                 player.hp = player.maxHp;
-                player.damage += 2;
+                player.maxMp += 8;
+                player.mp = player.maxMp;
+                player.baseDamage += 2;
+                player.defense += 1;
                 player.healCharges = player.maxHealCharges;
                 
-                const levelUp = document.createElement('div');
-                levelUp.className = 'level-up';
-                levelUp.textContent = '⭐ LEVEL UP! ⭐';
-                document.body.appendChild(levelUp);
-                setTimeout(() => levelUp.remove(), 1500);
+                // Show popup
+                $('newLevel').textContent = player.level;
+                $('levelGains').innerHTML = '+15 Max HP<br>+8 Max MP<br>+2 Damage<br>+1 Defense<br>Full Restore!';
+                $('levelUpPopup').classList.remove('hidden');
             }
-            
-            // Next wave
-            wave++;
-            spawnEnemy();
             updateDisplay();
         }
         
         function spawnEnemy() {
             const typeIndex = Math.min(Math.floor((wave - 1) / 3), enemyTypes.length - 1);
-            currentEnemyType = enemyTypes[typeIndex];
+            const baseEnemy = enemyTypes[typeIndex];
             
-            const waveMultiplier = 1 + (wave - 1) * 0.15;
-            enemy.maxHp = Math.floor(currentEnemyType.baseHp * waveMultiplier);
-            enemy.hp = enemy.maxHp;
-            enemy.damage = Math.floor(currentEnemyType.baseDamage * waveMultiplier);
+            const scale = 1 + (wave - 1) * 0.12;
             
+            enemy = {
+                name: baseEnemy.name,
+                icon: baseEnemy.icon,
+                hp: Math.floor(baseEnemy.hp * scale),
+                maxHp: Math.floor(baseEnemy.hp * scale),
+                damage: Math.floor(baseEnemy.damage * scale),
+                damageRange: Math.floor(baseEnemy.damage * 0.3),
+                defense: Math.floor(baseEnemy.defense * scale),
+                statusEffects: []
+            };
+            
+            isPlayerTurn = true;
             updateDisplay();
         }
         
         function gameOver() {
-            document.getElementById('finalWave').textContent = wave;
-            document.getElementById('finalGold').textContent = player.totalGold;
-            deathScreen.classList.remove('hidden');
+            $('finalWave').textContent = wave;
+            $('finalLevel').textContent = player.level;
+            $('finalGold').textContent = player.totalGold;
+            $('finalKills').textContent = player.kills;
+            $('deathScreen').classList.remove('hidden');
         }
         
         function restart() {
             player = {
-                level: 1, xp: 0, xpNeeded: 100, gold: 0, totalGold: 0,
-                hp: 100, maxHp: 100, damage: 10, critChance: 5, critMultiplier: 2,
-                healAmount: 30, healCharges: 3, maxHealCharges: 3
+                level: 1, xp: 0, xpNeeded: 100,
+                gold: 0, totalGold: 0, kills: 0,
+                hp: 100, maxHp: 100,
+                mp: 50, maxMp: 50,
+                baseDamage: 10, damageRange: 5,
+                defense: 5,
+                critChance: 5, critMultiplier: 2.0,
+                dodge: 5, lifesteal: 0,
+                healCharges: 3, maxHealCharges: 3, healAmount: 30,
+                isDefending: false,
+                combo: 0, ultimateCharge: 0,
+                statusEffects: [],
+                weapon: { name: 'Wooden Sword', damage: 5, icon: '⚔️' },
+                armor: { name: 'Cloth Armor', defense: 3 },
+                accessory: null
             };
-            upgrades.forEach(up => up.level = 0);
+            
+            statUpgrades.forEach(u => u.level = 0);
             wave = 1;
-            deathScreen.classList.add('hidden');
+            
+            $('deathScreen').classList.add('hidden');
             spawnEnemy();
-            updateDisplay();
         }
         
-        // Event Listeners
-        attackBtn.addEventListener('click', attack);
-        healBtn.addEventListener('click', heal);
-        document.getElementById('restartBtn').addEventListener('click', restart);
+        // === EVENT LISTENERS ===
+        $('attackBtn').onclick = playerAttack;
+        $('skillBtn').onclick = useSkill;
+        $('defendBtn').onclick = defend;
+        $('healBtn').onclick = heal;
+        $('specialBtn').onclick = useUltimate;
+        $('restartBtn').onclick = restart;
+        $('closeLevelUp').onclick = () => $('levelUpPopup').classList.add('hidden');
         
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === 'a') attack();
-            if (e.key === 'h') heal();
+        // Shop tabs
+        document.querySelectorAll('.shop-tab').forEach(tab => {
+            tab.onclick = () => {
+                document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentShopTab = tab.dataset.tab;
+                renderShop();
+            };
         });
         
-        // Initialize
+        // Skills
+        document.querySelectorAll('.skill-slot').forEach(slot => {
+            slot.onclick = () => {
+                if (slot.classList.contains('locked')) return;
+                document.querySelectorAll('.skill-slot').forEach(s => s.classList.remove('active'));
+                slot.classList.add('active');
+                selectedSkill = slot.dataset.skill;
+            };
+        });
+        
+        // Keyboard
+        document.addEventListener('keydown', e => {
+            if (e.key === '1' || e.key === 'a') playerAttack();
+            if (e.key === '2' || e.key === 's') useSkill();
+            if (e.key === '3' || e.key === 'd') defend();
+            if (e.key === '4' || e.key === 'h') heal();
+            if (e.key === '5' || e.key === 'u') useUltimate();
+        });
+        
+        // Init
         spawnEnemy();
         updateDisplay();
     </script>
