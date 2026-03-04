@@ -501,7 +501,10 @@
             
             <div class="form-group" id="energySymbolGroup">
                 <label>Energy Symbol (for moves)</label>
-                <input type="text" id="energySymbol" placeholder="⚡, 🔮, M..." value="⚡" maxlength="3">
+                <div class="move-row">
+                    <input type="text" id="energySymbol" placeholder="⚡, 🔮, M..." value="⚡" maxlength="3" style="flex:1;">
+                    <input type="color" id="energyColor" value="#4ecdc4" title="Energy Color" style="width: 50px; height: 38px; padding: 2px;">
+                </div>
             </div>
             
             <div class="form-group" id="hpGroup">
@@ -538,6 +541,11 @@
                     <option value="light">✨ Light</option>
                     <option value="nature">🌿 Nature</option>
                 </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Custom Type Icon (leave blank for default)</label>
+                <input type="text" id="customTypeIcon" placeholder="🌑, 👻, 💀..." value="" maxlength="3">
             </div>
             
             <div class="form-group">
@@ -700,12 +708,23 @@
             const rarity = document.getElementById('cardRarity').value;
             const energyName = document.getElementById('energyName').value || 'Energy';
             const energySymbol = document.getElementById('energySymbol').value || '⚡';
+            const energyColor = document.getElementById('energyColor').value || '#4ecdc4';
+            const customTypeIcon = document.getElementById('customTypeIcon').value;
             const hp = document.getElementById('cardHp').value || '100';
             const hpIcon = document.getElementById('hpIcon').value || '❤️';
             const hpColor = document.getElementById('hpColor').value || '#ff6b6b';
             const moveDescMode = document.getElementById('moveDescMode').value;
             const move1Desc = document.getElementById('move1Desc').value || '';
             const move2Desc = document.getElementById('move2Desc').value || '';
+            
+            // Type names for energy cards
+            const typeNames = {
+                fire: 'Fire', water: 'Water', earth: 'Earth', air: 'Air',
+                electric: 'Electric', shadow: 'Shadow', light: 'Light', nature: 'Nature'
+            };
+            
+            // Get the icon to use (custom or default)
+            const displayIcon = customTypeIcon || typeIcons[type];
             
             const move1Name = document.getElementById('move1Name').value || 'Move 1';
             const move1Dmg = document.getElementById('move1Dmg').value || '0';
@@ -722,7 +741,7 @@
             const desc = document.getElementById('cardDesc').value || 'No description';
             
             document.getElementById('previewName').textContent = name;
-            document.getElementById('previewTypeIcon').textContent = typeIcons[type];
+            document.getElementById('previewTypeIcon').textContent = displayIcon;
             const hpEl = document.getElementById('previewHp');
             hpEl.textContent = hpIcon + ' ' + hp;
             hpEl.style.color = hpColor;
@@ -738,9 +757,9 @@
                 previewMove3.style.display = 'none';
                 
                 // Update moves with descriptions
-                document.getElementById('previewMove1').innerHTML = `<div class="move-header"><span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span></div>${move1Desc ? '<span class="move-desc-text">' + move1Desc + '</span>' : ''}`;
+                document.getElementById('previewMove1').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span></div>${move1Desc ? '<span class="move-desc-text">' + move1Desc + '</span>' : ''}`;
                 document.getElementById('previewMove1').className = move1Desc ? 'move with-desc' : 'move';
-                document.getElementById('previewMove2').innerHTML = `<div class="move-header"><span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span></div>${move2Desc ? '<span class="move-desc-text">' + move2Desc + '</span>' : ''}`;
+                document.getElementById('previewMove2').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span></div>${move2Desc ? '<span class="move-desc-text">' + move2Desc + '</span>' : ''}`;
                 document.getElementById('previewMove2').className = move2Desc ? 'move with-desc' : 'move';
             } else {
                 descInputs.forEach(input => input.style.display = 'none');
@@ -748,11 +767,11 @@
                 previewMove3.style.display = 'flex';
                 
                 // Update moves without descriptions
-                document.getElementById('previewMove1').innerHTML = `<span class="move-cost">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
+                document.getElementById('previewMove1').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
                 document.getElementById('previewMove1').className = 'move';
-                document.getElementById('previewMove2').innerHTML = `<span class="move-cost">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
+                document.getElementById('previewMove2').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
                 document.getElementById('previewMove2').className = 'move';
-                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
             }
             
             // Handle card categories
@@ -770,7 +789,7 @@
                 energyInfo.style.display = 'block';
                 cardImage.style.display = 'none';
                 document.getElementById('previewHp').style.display = 'none';
-                energyInfo.innerHTML = `<div class="energy-amount">+${energyAmountVal}</div><div class="energy-symbol">${energySymbol}</div><div class="energy-type-label">${energyName}</div>`;
+                energyInfo.innerHTML = `<div class="energy-amount" style="color:${energyColor}; text-shadow: 0 0 20px ${energyColor}">+${energyAmountVal}</div><div class="energy-symbol">${energySymbol}</div><div class="energy-type-label">${typeNames[type]} ${energyName}</div>`;
                 document.getElementById('movesSection').style.display = 'none';
                 document.getElementById('specialMoveSection').style.display = 'none';
                 document.getElementById('energyAmountGroup').style.display = 'block';
@@ -784,7 +803,7 @@
                 specialSection.style.display = 'none';
                 energyInfo.style.display = 'none';
                 // Make move 3 look like a special/mega move
-                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name" style="color:#ffd700;font-weight:bold;">⭐ ${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move3Cost}${energySymbol}</span><span class="move-name" style="color:#ffd700;font-weight:bold;">⭐ ${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
                 document.getElementById('previewMove3').style.background = 'linear-gradient(90deg, rgba(255,215,0,0.3), rgba(255,100,0,0.3))';
                 document.getElementById('previewMove3').style.border = '1px solid #ffd700';
                 document.getElementById('movesSection').style.display = 'block';
@@ -797,7 +816,7 @@
                 document.getElementById('previewHp').style.display = 'inline';
                 document.getElementById('hpGroup').style.display = 'block';
                 // Reset move 3 to normal style
-                document.getElementById('previewMove3').innerHTML = `<span class="move-cost">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
                 document.getElementById('previewMove3').style.background = 'rgba(255,255,255,0.1)';
                 document.getElementById('previewMove3').style.border = 'none';
                 document.getElementById('movesSection').style.display = 'block';
