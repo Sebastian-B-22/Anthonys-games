@@ -517,10 +517,20 @@
             </div>
             
             <div class="form-group">
+                <label>🎯 Number of Moves</label>
+                <select id="moveCount">
+                    <option value="1">1 Move</option>
+                    <option value="2">2 Moves</option>
+                    <option value="3" selected>3 Moves</option>
+                    <option value="4">4 Moves</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label>📝 Move Descriptions</label>
                 <select id="moveDescMode">
-                    <option value="none">No descriptions (3 moves)</option>
-                    <option value="desc">With descriptions (2 moves)</option>
+                    <option value="none">No descriptions</option>
+                    <option value="desc">With descriptions</option>
                 </select>
             </div>
             
@@ -571,7 +581,7 @@
                     </div>
                     <input type="text" id="move1Desc" class="move-desc-input" placeholder="Move description (optional)..." style="display:none; margin-top:5px;">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="move2Group">
                     <label>🔥 Move 2</label>
                     <div class="move-row">
                         <input type="number" id="move2Cost" placeholder="⚡" value="2" min="0" max="99" style="width: 50px;" title="Energy Cost">
@@ -587,6 +597,16 @@
                         <input type="text" id="move3Name" placeholder="Move name..." value="Ultimate Blast">
                         <input type="number" id="move3Dmg" placeholder="DMG" value="150" min="0" max="999" style="width: 70px;">
                     </div>
+                    <input type="text" id="move3Desc" class="move-desc-input" placeholder="Move description (optional)..." style="display:none; margin-top:5px;">
+                </div>
+                <div class="form-group" id="move4Group" style="display:none;">
+                    <label>⭐ Move 4</label>
+                    <div class="move-row">
+                        <input type="number" id="move4Cost" placeholder="⚡" value="5" min="0" max="99" style="width: 50px;" title="Energy Cost">
+                        <input type="text" id="move4Name" placeholder="Move name..." value="Mega Strike">
+                        <input type="number" id="move4Dmg" placeholder="DMG" value="200" min="0" max="999" style="width: 70px;">
+                    </div>
+                    <input type="text" id="move4Desc" class="move-desc-input" placeholder="Move description (optional)..." style="display:none; margin-top:5px;">
                 </div>
             </div>
             <div id="specialMoveSection" style="display: none;">
@@ -667,6 +687,11 @@
                             <span class="move-name">Ultimate Blast</span>
                             <span class="move-dmg">150</span>
                         </div>
+                        <div class="move" id="previewMove4" style="display:none;">
+                            <span class="move-cost">5⚡</span>
+                            <span class="move-name">Mega Strike</span>
+                            <span class="move-dmg">200</span>
+                        </div>
                     </div>
                     <div class="special-move" id="previewSpecial" style="display: none;">
                         <div class="move special">
@@ -716,6 +741,9 @@
             const moveDescMode = document.getElementById('moveDescMode').value;
             const move1Desc = document.getElementById('move1Desc').value || '';
             const move2Desc = document.getElementById('move2Desc').value || '';
+            const move3Desc = document.getElementById('move3Desc').value || '';
+            const move4Desc = document.getElementById('move4Desc').value || '';
+            const moveCount = parseInt(document.getElementById('moveCount').value) || 3;
             
             // Type names for energy cards
             const typeNames = {
@@ -735,6 +763,9 @@
             const move3Name = document.getElementById('move3Name').value || 'Move 3';
             const move3Dmg = document.getElementById('move3Dmg').value || '0';
             const move3Cost = document.getElementById('move3Cost').value || '0';
+            const move4Name = document.getElementById('move4Name').value || 'Move 4';
+            const move4Dmg = document.getElementById('move4Dmg').value || '0';
+            const move4Cost = document.getElementById('move4Cost').value || '0';
             const specialName = document.getElementById('specialName').value || 'SPECIAL';
             const specialDmg = document.getElementById('specialDmg').value || '0';
             const specialCost = document.getElementById('specialCost').value || '0';
@@ -751,27 +782,47 @@
             const move3Group = document.getElementById('move3Group');
             const previewMove3 = document.getElementById('previewMove3');
             
+            // Show/hide move input fields based on count
+            const move2Group = document.getElementById('move2Group');
+            const move4Group = document.getElementById('move4Group');
+            const previewMove2 = document.getElementById('previewMove2');
+            const previewMove4 = document.getElementById('previewMove4');
+            
+            // Show/hide based on move count
+            if (move2Group) move2Group.style.display = moveCount >= 2 ? 'block' : 'none';
+            move3Group.style.display = moveCount >= 3 ? 'block' : 'none';
+            move4Group.style.display = moveCount >= 4 ? 'block' : 'none';
+            
+            previewMove2.style.display = moveCount >= 2 ? 'flex' : 'none';
+            previewMove3.style.display = moveCount >= 3 ? 'flex' : 'none';
+            previewMove4.style.display = moveCount >= 4 ? 'flex' : 'none';
+            
+            // Show descriptions if enabled
             if (moveDescMode === 'desc') {
                 descInputs.forEach(input => input.style.display = 'block');
-                move3Group.style.display = 'none';
-                previewMove3.style.display = 'none';
-                
-                // Update moves with descriptions
+            } else {
+                descInputs.forEach(input => input.style.display = 'none');
+            }
+            
+            // Update all moves with or without descriptions
+            if (moveDescMode === 'desc') {
                 document.getElementById('previewMove1').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span></div>${move1Desc ? '<span class="move-desc-text">' + move1Desc + '</span>' : ''}`;
                 document.getElementById('previewMove1').className = move1Desc ? 'move with-desc' : 'move';
                 document.getElementById('previewMove2').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span></div>${move2Desc ? '<span class="move-desc-text">' + move2Desc + '</span>' : ''}`;
                 document.getElementById('previewMove2').className = move2Desc ? 'move with-desc' : 'move';
+                document.getElementById('previewMove3').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span></div>${move3Desc ? '<span class="move-desc-text">' + move3Desc + '</span>' : ''}`;
+                document.getElementById('previewMove3').className = move3Desc ? 'move with-desc' : 'move';
+                document.getElementById('previewMove4').innerHTML = `<div class="move-header"><span class="move-cost" style="color:${energyColor}">${move4Cost}${energySymbol}</span><span class="move-name">${move4Name}</span><span class="move-dmg">${move4Dmg}</span></div>${move4Desc ? '<span class="move-desc-text">' + move4Desc + '</span>' : ''}`;
+                document.getElementById('previewMove4').className = move4Desc ? 'move with-desc' : 'move';
             } else {
-                descInputs.forEach(input => input.style.display = 'none');
-                move3Group.style.display = 'block';
-                previewMove3.style.display = 'flex';
-                
-                // Update moves without descriptions
                 document.getElementById('previewMove1').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move1Cost}${energySymbol}</span><span class="move-name">${move1Name}</span><span class="move-dmg">${move1Dmg}</span>`;
                 document.getElementById('previewMove1').className = 'move';
                 document.getElementById('previewMove2').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move2Cost}${energySymbol}</span><span class="move-name">${move2Name}</span><span class="move-dmg">${move2Dmg}</span>`;
                 document.getElementById('previewMove2').className = 'move';
                 document.getElementById('previewMove3').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move3Cost}${energySymbol}</span><span class="move-name">${move3Name}</span><span class="move-dmg">${move3Dmg}</span>`;
+                document.getElementById('previewMove3').className = 'move';
+                document.getElementById('previewMove4').innerHTML = `<span class="move-cost" style="color:${energyColor}">${move4Cost}${energySymbol}</span><span class="move-name">${move4Name}</span><span class="move-dmg">${move4Dmg}</span>`;
+                document.getElementById('previewMove4').className = 'move';
             }
             
             // Handle card categories
