@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Area Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #bbb;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #f39c12;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #0f3460;
+            color: #eee;
+            border: 2px solid #f39c12;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #e67e22;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .generate-btn {
+            background: #f39c12;
+            color: #1a1a2e;
+        }
+
+        .generate-btn:hover {
+            background: #e67e22;
+            transform: scale(1.05);
+        }
+
+        .save-btn {
+            background: #27ae60;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #229954;
+            transform: scale(1.05);
+        }
+
+        .save-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .area-name {
+            font-size: 2em;
+            color: #f39c12;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #27ae60;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 5px;
+        }
+
+        .section-content {
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #0f3460;
+            padding: 5px 10px;
+            margin: 5px 5px 5px 0;
+            border-radius: 5px;
+            border: 1px solid #f39c12;
+            color: #f39c12;
+        }
+
+        .saved-areas {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .saved-areas h2 {
+            color: #3498db;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .saved-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .saved-item h3 {
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+
+        .saved-item p {
+            color: #bbb;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Fantasy Area Generator</h1>
+        <p class="subtitle">For Anthony's Graphic Novel</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="vibe">Vibe:</label>
+                <select id="vibe">
+                    <option value="dark">Dark/Horror</option>
+                    <option value="classic">Classic Fantasy</option>
+                    <option value="weird">Weird/Surreal</option>
+                    <option value="epic">Epic/Grand</option>
+                    <option value="cozy">Cozy/Peaceful</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="terrain">Terrain Type:</label>
+                <select id="terrain">
+                    <option value="forest">Forest</option>
+                    <option value="desert">Desert</option>
+                    <option value="mountains">Mountains</option>
+                    <option value="caves">Caves</option>
+                    <option value="swamp">Swamp</option>
+                    <option value="ruins">Ruins</option>
+                    <option value="ocean">Ocean/Coast</option>
+                    <option value="tundra">Tundra/Ice</option>
+                    <option value="volcano">Volcanic</option>
+                    <option value="city">Abandoned City</option>
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button class="generate-btn" onclick="generateArea()">Generate Area</button>
+                <button class="save-btn" id="saveBtn" onclick="saveArea()" disabled>Save This Area</button>
+            </div>
+        </div>
+
+        <div class="result" id="result">
+            <div class="area-name" id="areaName"></div>
+            
+            <div class="section">
+                <div class="section-title">📝 Description</div>
+                <div class="section-content" id="description"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">👾 Creatures & Inhabitants</div>
+                <div class="section-content" id="creatures"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">💎 Resources</div>
+                <div class="section-content" id="resources"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">⚠️ Dangers</div>
+                <div class="section-content" id="dangers"></div>
+            </div>
+        </div>
+
+        <div class="saved-areas">
+            <h2>💾 Saved Areas</h2>
+            <div id="savedList"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentArea = null;
+
+        const areaData = {
+            dark: {
+                forest: {
+                    prefixes: ["Shadow", "Cursed", "Haunted", "Blackened", "Corrupted", "Twisted", "Forsaken"],
+                    suffixes: ["Woods", "Grove", "Thicket", "Hollow", "Depths"],
+                    descriptions: [
+                        "Trees here are gnarled and twisted, their branches forming clawed shapes against a perpetually gray sky.",
+                        "An oppressive silence hangs heavy - even the wind seems afraid to disturb the darkness.",
+                        "The ground is covered in a carpet of dead leaves that crunch underfoot, masking what lurks beneath.",
+                        "Strange whispers echo between the trees, though no living thing can be seen."
+                    ],
+                    creatures: ["Shadow Wraiths", "Corrupted Beasts", "Lost Souls", "Plague Wolves", "Nightmare Stalkers", "Gloom Spiders"],
+                    resources: ["Cursed Wood", "Dark Herbs", "Shadow Crystals", "Ancient Bones"],
+                    dangers: ["Reality distortion zones", "Mind-affecting fog", "Sudden darkness that swallows light", "Trees that move when unwatched"]
+                },
+                desert: {
+                    prefixes: ["Bone", "Death", "Scorched", "Cursed", "Ashen", "Forgotten"],
+                    suffixes: ["Wastes", "Sands", "Dunes", "Plains", "Expanse"],
+                    descriptions: [
+                        "The sand here is mixed with ash and bone fragments from forgotten wars.",
+                        "Heat mirages reveal glimpses of horrible things that may or may not be real.",
+                        "At night, the temperature plummets and strange lights dance on the horizon.",
+                        "The wind carries screams from battles long past."
+                    ],
+                    creatures: ["Sand Wraiths", "Bone Scorpions", "Mummified Guardians", "Heat Phantoms", "Dune Lurkers"],
+                    resources: ["Cursed Gems", "Ancient Artifacts", "Preserved Remains", "Dark Glass"],
+                    dangers: ["Quicksand pits that pull victims down to ancient tombs", "Sandstorms that strip flesh from bone", "Cursed oases", "Temperature extremes"]
+                },
+                caves: {
+                    prefixes: ["Abyssal", "Forgotten", "Shadow", "Cursed", "Deep", "Lost"],
+                    suffixes: ["Caverns", "Depths", "Hollows", "Pits", "Tunnels"],
+                    descriptions: [
+                        "The darkness here is absolute - torches seem to provide less light than they should.",
+                        "Distant sounds of dripping water and scraping echo from unknown depths.",
+                        "The walls are covered in strange symbols that seem to shift when you look away.",
+                        "A cold draft flows from deeper chambers, carrying the scent of decay."
+                    ],
+                    creatures: ["Cave Ghouls", "Stone Wraiths", "Echo Beasts", "Darkness Dwellers", "Blind Horrors"],
+                    resources: ["Dark Crystals", "Ancient Fossils", "Underground Fungi", "Cursed Ore"],
+                    dangers: ["Cave-ins triggered by sound", "Pools of acidic water", "Suffocating darkness", "Ancient traps"]
+                }
+            },
+            classic: {
+                forest: {
+                    prefixes: ["Emerald", "Ancient", "Whispering", "Enchanted", "Mystic", "Silver"],
+                    suffixes: ["Woods", "Forest", "Grove", "Glade", "Canopy"],
+                    descriptions: [
+                        "Sunlight filters through the dense canopy, creating dancing patterns on the forest floor.",
+                        "The air is filled with the songs of exotic birds and the rustling of small creatures.",
+                        "Moss-covered stones mark paths that were old when the world was young.",
+                        "Crystal-clear streams wind between ancient trees that have stood for centuries."
+                    ],
+                    creatures: ["Forest Sprites", "Dire Wolves", "Giant Owls", "Tree Ents", "Unicorns", "Centaurs"],
+                    resources: ["Rare Herbs", "Enchanted Wood", "Pure Spring Water", "Ancient Seeds"],
+                    dangers: ["Getting lost in endless trails", "Territorial beasts", "Magical wards", "Seasonal floods"]
+                },
+                mountains: {
+                    prefixes: ["Storm", "Eagle", "Dragon", "Sky", "Cloud", "Thunder"],
+                    suffixes: ["Peaks", "Range", "Heights", "Spires", "Mountains"],
+                    descriptions: [
+                        "Jagged peaks pierce the clouds, their summits lost in eternal mists.",
+                        "Stone bridges carved by ancient dwarves connect impossible heights.",
+                        "Eagles nest in the highest crags, their calls echoing across the valleys.",
+                        "Waterfalls cascade thousands of feet into mist-shrouded pools below."
+                    ],
+                    creatures: ["Mountain Trolls", "Giant Eagles", "Stone Giants", "Dragons", "Snow Leopards"],
+                    resources: ["Precious Metals", "Gemstones", "Rare Minerals", "Ancient Carvings"],
+                    dangers: ["Avalanches", "Thin air at high altitude", "Sudden storms", "Unstable paths"]
+                }
+            },
+            weird: {
+                forest: {
+                    prefixes: ["Inverted", "Crystalline", "Floating", "Mirrored", "Singing", "Backwards"],
+                    suffixes: ["Groves", "Gardens", "Thicket", "Maze", "Woods"],
+                    descriptions: [
+                        "The trees grow upside-down, their roots reaching toward a sky that's actually below.",
+                        "Colors here don't quite match reality - blues taste like honey, reds sound like bells.",
+                        "Gravity works sideways in some clearings, allowing you to walk on tree trunks.",
+                        "The forest remembers the future but has forgotten the past."
+                    ],
+                    creatures: ["Time-Shifted Deer", "Gravity Butterflies", "Backwards Birds", "Crystal Wolves", "Dimensional Sprites"],
+                    resources: ["Paradox Fruit", "Memory Flowers", "Temporal Wood", "Reality Crystals"],
+                    dangers: ["Causality loops", "Getting stuck between dimensions", "Memories becoming real", "Time flowing backwards"]
+                },
+                city: {
+                    prefixes: ["Impossible", "Sideways", "Dream", "Floating", "Folded", "Recursive"],
+                    suffixes: ["City", "Metropolis", "Ruins", "Sprawl", "District"],
+                    descriptions: [
+                        "Buildings exist in multiple states simultaneously - both ruined and pristine.",
+                        "Streets fold back on themselves, creating paths to nowhere and everywhere.",
+                        "Windows show reflections of places that never existed or haven't happened yet.",
+                        "The architecture defies physics, with staircases leading in all directions including up."
+                    ],
+                    creatures: ["Probability Shadows", "Echo People", "Living Statues", "Dimension Hoppers", "Memory Ghosts"],
+                    resources: ["Impossible Geometry", "Schrödinger Materials", "Paradox Coins", "Dream Architecture"],
+                    dangers: ["Reality breaking down", "Getting lost in recursive loops", "Merging with alternate versions of yourself", "Physics working differently block by block"]
+                }
+            }
+        };
+
+        function random(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateArea() {
+            const vibe = document.getElementById('vibe').value;
+            const terrain = document.getElementById('terrain').value;
+
+            // Get data or use fallback
+            const data = areaData[vibe]?.[terrain] || areaData.classic.forest;
+
+            const name = `${random(data.prefixes)} ${random(data.suffixes)}`;
+            const description = random(data.descriptions);
+            const creatures = [];
+            const numCreatures = 2 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < numCreatures; i++) {
+                const creature = random(data.creatures);
+                if (!creatures.includes(creature)) creatures.push(creature);
+            }
+            
+            const resources = [];
+            const numResources = 2 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < numResources; i++) {
+                const resource = random(data.resources);
+                if (!resources.includes(resource)) resources.push(resource);
+            }
+
+            const dangers = [];
+            const numDangers = 1 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < numDangers; i++) {
+                const danger = random(data.dangers);
+                if (!dangers.includes(danger)) dangers.push(danger);
+            }
+
+            currentArea = {
+                name,
+                vibe,
+                terrain,
+                description,
+                creatures,
+                resources,
+                dangers,
+                timestamp: new Date().toLocaleString()
+            };
+
+            displayArea(currentArea);
+            document.getElementById('saveBtn').disabled = false;
+        }
+
+        function displayArea(area) {
+            document.getElementById('areaName').textContent = area.name;
+            document.getElementById('description').textContent = area.description;
+            
+            document.getElementById('creatures').innerHTML = area.creatures
+                .map(c => `<span class="tag">${c}</span>`).join('');
+            
+            document.getElementById('resources').innerHTML = area.resources
+                .map(r => `<span class="tag">${r}</span>`).join('');
+            
+            document.getElementById('dangers').innerHTML = area.dangers
+                .map(d => `<span class="tag">${d}</span>`).join('');
+
+            document.getElementById('result').classList.add('show');
+        }
+
+        function saveArea() {
+            if (!currentArea) return;
+
+            const saved = JSON.parse(localStorage.getItem('savedAreas') || '[]');
+            saved.unshift(currentArea);
+            localStorage.setItem('savedAreas', JSON.stringify(saved));
+
+            document.getElementById('saveBtn').disabled = true;
+            loadSavedAreas();
+        }
+
+        function deleteArea(index) {
+            const saved = JSON.parse(localStorage.getItem('savedAreas') || '[]');
+            saved.splice(index, 1);
+            localStorage.setItem('savedAreas', JSON.stringify(saved));
+            loadSavedAreas();
+        }
+
+        function loadSavedAreas() {
+            const saved = JSON.parse(localStorage.getItem('savedAreas') || '[]');
+            const container = document.getElementById('savedList');
+
+            if (saved.length === 0) {
+                container.innerHTML = '<div class="empty-state">No saved areas yet. Generate and save some!</div>';
+                return;
+            }
+
+            container.innerHTML = saved.map((area, index) => `
+                <div class="saved-item">
+                    <button class="delete-btn" onclick="deleteArea(${index})">Delete</button>
+                    <h3>${area.name}</h3>
+                    <p><strong>Vibe:</strong> ${area.vibe} | <strong>Terrain:</strong> ${area.terrain}</p>
+                    <p><strong>Saved:</strong> ${area.timestamp}</p>
+                    <p style="margin-top: 10px;">${area.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // Load saved areas on page load
+        loadSavedAreas();
+    </script>
+</body>
+</html>
