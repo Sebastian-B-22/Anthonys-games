@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a0b2e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff4757;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255,71,87,0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #bbb;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #ff4757;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #ff4757;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #1a0b2e;
+            color: #eee;
+            border: 2px solid #ff4757;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+
+        .generate-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .generate-btn:hover {
+            background: #ff6b81;
+            transform: scale(1.05);
+        }
+
+        .save-btn {
+            background: #5f27cd;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #341f97;
+            transform: scale(1.05);
+        }
+
+        .save-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .monster-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #ff4757;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .monster-card.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .monster-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(255,71,87,0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .monster-name {
+            font-size: 2.2em;
+            color: #ff4757;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .danger-level {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .skull {
+            color: #ff4757;
+        }
+
+        .monster-type {
+            text-align: center;
+            color: #bbb;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+
+        .detail-title {
+            color: #5f27cd;
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #5f27cd;
+            padding-bottom: 5px;
+        }
+
+        .detail-content {
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            background: rgba(95,39,205,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #5f27cd;
+        }
+
+        .stat-label {
+            color: #5f27cd;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #1a0b2e;
+            padding: 5px 10px;
+            margin: 5px 5px 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ff4757;
+            color: #ff4757;
+        }
+
+        .saved-monsters {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #5f27cd;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .saved-monsters h2 {
+            color: #5f27cd;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .saved-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .saved-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(5px);
+        }
+
+        .saved-item h3 {
+            color: #ff4757;
+            margin-bottom: 5px;
+        }
+
+        .saved-item p {
+            color: #bbb;
+            font-size: 0.9em;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 10;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .expanded-view {
+            display: none;
+        }
+
+        .expanded-view.show {
+            display: block;
+        }
+
+        .click-hint {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👹 Monster Generator</h1>
+        <p class="subtitle">Create Creatures for Your Fantasy World</p>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="vibe">Monster Vibe:</label>
+                <select id="vibe">
+                    <option value="dark">Dark/Horror</option>
+                    <option value="classic">Classic Fantasy</option>
+                    <option value="weird">Weird/Surreal</option>
+                    <option value="epic">Epic/Legendary</option>
+                    <option value="cute">Cute but Dangerous</option>
+                </select>
+            </div>
+
+            <div class="buttons">
+                <button class="generate-btn" onclick="generateMonster()">Generate Monster</button>
+                <button class="save-btn" id="saveBtn" onclick="saveMonster()" disabled>Save Monster</button>
+            </div>
+        </div>
+
+        <div class="monster-card" id="monsterCard" onclick="toggleExpanded()">
+            <div class="monster-name" id="monsterName"></div>
+            <div class="danger-level" id="dangerLevel"></div>
+            <div class="monster-type" id="monsterType"></div>
+            
+            <div class="click-hint">👆 Click to view full details</div>
+
+            <div class="expanded-view" id="expandedView">
+                <div class="detail-section">
+                    <div class="detail-title">👁️ Appearance</div>
+                    <div class="detail-content" id="appearance"></div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">⚔️ Abilities & Powers</div>
+                    <div class="detail-content" id="abilities"></div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">💀 Weaknesses</div>
+                    <div class="detail-content" id="weaknesses"></div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">🗺️ Habitat</div>
+                    <div class="detail-content" id="habitat"></div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">🎲 Stats</div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Health</div>
+                            <div id="statHealth"></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Attack</div>
+                            <div id="statAttack"></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Defense</div>
+                            <div id="statDefense"></div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Speed</div>
+                            <div id="statSpeed"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">📖 Lore</div>
+                    <div class="detail-content" id="lore"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="saved-monsters">
+            <h2>💾 Monster Collection</h2>
+            <div id="savedList"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentMonster = null;
+        let expandedMonster = null;
+
+        const monsterData = {
+            dark: {
+                prefixes: ["Shadow", "Void", "Nightmare", "Cursed", "Plague", "Death", "Bone", "Blood", "Corrupted", "Twisted"],
+                suffixes: ["Stalker", "Horror", "Wraith", "Beast", "Fiend", "Devourer", "Hunter", "Reaper", "Spawn", "Terror"],
+                types: ["Undead Abomination", "Eldritch Horror", "Corrupted Spirit", "Nightmare Creature", "Void Entity"],
+                appearances: [
+                    "A mass of writhing shadows barely held together in a vaguely humanoid form, with eyes that glow like dying embers.",
+                    "Skeletal frame wrapped in torn, rotting flesh. Bones protrude at odd angles, and its jaw hangs unnaturally low.",
+                    "Impossibly tall and thin, with limbs that bend backwards. Its face is a featureless mask of cracked porcelain.",
+                    "Covered in pulsating tumors and weeping sores. Multiple mouths open and close across its body, whispering secrets.",
+                    "A creature that seems to absorb light around it. Only its outline is visible, constantly shifting and morphing."
+                ],
+                abilities: [
+                    "Fear Aura - Causes overwhelming dread in anyone within 30 feet",
+                    "Life Drain - Siphons vitality from living creatures through touch",
+                    "Shadow Walk - Can teleport between shadows",
+                    "Nightmare Inducement - Victims relive their worst fears",
+                    "Corruption Touch - Spreads disease and decay with every strike",
+                    "Soul Harvest - Traps dying souls to fuel its power",
+                    "Darkness Manipulation - Controls shadows as physical weapons"
+                ],
+                weaknesses: [
+                    "Pure sunlight causes severe pain and prevents regeneration",
+                    "Sacred symbols force it to recoil and lose concentration",
+                    "Fire purifies its corrupted essence",
+                    "Must return to its spawning ground once per lunar cycle"
+                ],
+                habitats: ["Cursed crypts", "Abandoned battlefields", "Deep caves untouched by light", "Haunted ruins", "Shadow realms"],
+                lore: [
+                    "Created when a powerful sorcerer's experiment went horribly wrong, binding souls to twisted flesh.",
+                    "Born from the collective nightmares of a village that perished in plague.",
+                    "A guardian that failed its duty and was cursed to hunt innocents for eternity.",
+                    "The manifestation of ancient hatred given physical form through dark rituals."
+                ]
+            },
+            classic: {
+                prefixes: ["Ancient", "Great", "Noble", "Wild", "Storm", "Mountain", "Forest", "Iron", "Crystal", "Frost"],
+                suffixes: ["Drake", "Griffin", "Wyvern", "Behemoth", "Basilisk", "Chimera", "Hydra", "Manticore", "Phoenix", "Wyrm"],
+                types: ["Legendary Beast", "Mythical Creature", "Dragon Kin", "Magical Monster", "Ancient Guardian"],
+                appearances: [
+                    "A majestic creature with golden scales and wings that span forty feet. Its eyes gleam with ancient intelligence.",
+                    "Muscular leonine body with powerful eagle wings and razor-sharp talons. Its beak could snap a tree trunk.",
+                    "Serpentine body covered in iridescent scales that shimmer like opals. Multiple heads weave and strike independently.",
+                    "Four-legged beast with the mane of a lion, tail of a scorpion, and bat-like wings. Horn spirals from its forehead.",
+                    "Covered in crystalline armor that refracts light into rainbow patterns. Moves with surprising grace despite its size."
+                ],
+                abilities: [
+                    "Elemental Breath - Unleashes devastating fire, ice, or lightning",
+                    "Regeneration - Can regrow severed heads or limbs",
+                    "Magic Resistance - Spells have reduced effect",
+                    "Territorial Roar - Sonic blast that stuns enemies",
+                    "Flight - Powerful wings allow incredible aerial maneuvers",
+                    "Petrifying Gaze - Turns victims to stone",
+                    "Ancient Magic - Can cast spells instinctively"
+                ],
+                weaknesses: [
+                    "Vulnerable underbelly where scales don't fully overlap",
+                    "Extreme cold slows its metabolism to near dormancy",
+                    "Obsessed with gold and treasures - can be distracted",
+                    "Pride makes it underestimate smaller opponents"
+                ],
+                habitats: ["Mountain peaks", "Deep forests", "Volcanic lairs", "Crystal caves", "Ancient temples"],
+                lore: [
+                    "One of the last of its kind, guarding treasures gathered over centuries.",
+                    "Blessed by ancient gods to protect sacred groves from mortals.",
+                    "Born from elemental chaos when the world was young.",
+                    "A hero transformed by a curse, retaining fragments of memory and nobility."
+                ]
+            },
+            weird: {
+                prefixes: ["Impossible", "Backwards", "Inside-Out", "Probability", "Dimensional", "Temporal", "Paradox", "Recursive", "Quantum", "Sideways"],
+                suffixes: ["Anomaly", "Glitch", "Paradox", "Entity", "Being", "Phenomenon", "Aberration", "Construct", "Loop", "Fragment"],
+                types: ["Reality Distortion", "Temporal Anomaly", "Dimensional Being", "Conceptual Entity", "Impossible Creature"],
+                appearances: [
+                    "Exists in multiple states simultaneously - both solid and liquid, present and absent, here and elsewhere.",
+                    "Its geometry doesn't make sense. Limbs connect at angles that hurt to perceive. Looking at it gives you a headache.",
+                    "A creature that's always moving backwards through time relative to you. You see where it will be, not where it is.",
+                    "Made entirely of crystallized probability. Changes form based on what you expect to see.",
+                    "Looks normal until you realize it has too many shadows, or not enough, or shadows that belong to different things entirely."
+                ],
+                abilities: [
+                    "Phase Shift - Exists partially outside reality",
+                    "Causality Reversal - Effects happen before causes",
+                    "Probability Manipulation - Makes unlikely events certain",
+                    "Dimensional Pocket - Stores victims in folded space",
+                    "Time Dilation Field - Area where time flows differently",
+                    "Reality Editing - Changes small aspects of local physics",
+                    "Echo Spawning - Creates delayed copies of itself"
+                ],
+                weaknesses: [
+                    "Unstable in areas of normal physics - struggles to maintain form",
+                    "Mirrors confuse its dimensional anchoring",
+                    "Paradoxes cause it to temporarily cease existing",
+                    "Cannot affect those who refuse to acknowledge its existence"
+                ],
+                habitats: ["Places where reality is thin", "Temporal loops", "Impossible architecture", "Dreams that became real", "Between dimensions"],
+                lore: [
+                    "A failed experiment in reality manipulation that gained sentience.",
+                    "Created when someone tried to divide by zero in the fabric of space-time.",
+                    "The universe's attempt to debug itself, given form.",
+                    "A thought that became so complex it achieved independent existence."
+                ]
+            },
+            epic: {
+                prefixes: ["Titan", "Celestial", "Divine", "World", "Star", "Eternal", "Primordial", "Cosmic", "Legendary", "Supreme"],
+                suffixes: ["Colossus", "Leviathan", "Sovereign", "Guardian", "Destroyer", "Keeper", "Arbiter", "Ancient", "Eternal", "Prime"],
+                types: ["Titan", "Demigod Beast", "World Guardian", "Cosmic Entity", "Primordial Force"],
+                appearances: [
+                    "So massive it could be mistaken for a mountain range. Each step causes earthquakes. Stars reflect in its eyes.",
+                    "Wreathed in cosmic energy, its form constantly shifting between mortal comprehension and divine abstraction.",
+                    "Carved from living stone by gods themselves, covered in runes that pulse with ancient power.",
+                    "A being of pure energy barely contained in physical form. Lightning and fire cascade from its presence.",
+                    "Ancient beyond measure, its body hosts entire ecosystems. Trees grow on its back, rivers flow in its veins."
+                ],
+                abilities: [
+                    "Reality Shaping - Can reshape terrain with a thought",
+                    "Immortal Essence - Cannot truly die, only banished temporarily",
+                    "Divine Judgment - Smites the unworthy with celestial power",
+                    "World Walking - Teleports across vast distances instantly",
+                    "Cosmic Awareness - Knows all that occurs in its domain",
+                    "Elemental Mastery - Commands all natural forces",
+                    "Titan Strength - Can move mountains and part seas"
+                ],
+                weaknesses: [
+                    "Bound by ancient oaths it cannot break",
+                    "Mortal weapons blessed by gods can harm it",
+                    "Power is tied to a specific location or artifact",
+                    "Can be sealed away through complex rituals"
+                ],
+                habitats: ["The heart of the world", "Between planes of existence", "Floating sky fortresses", "The ocean's deepest trenches", "Volcanic cores"],
+                lore: [
+                    "Created by the gods to protect reality from threats beyond mortal understanding.",
+                    "The last survivor of a cosmic war that shaped the universe.",
+                    "A force of nature given consciousness and purpose.",
+                    "Once mortal, ascended through deeds so legendary they transcended mortality."
+                ]
+            },
+            cute: {
+                prefixes: ["Tiny", "Fluffy", "Sparkle", "Bubble", "Sugar", "Cotton", "Glitter", "Fuzzy", "Sweet", "Bouncy"],
+                suffixes: ["Puff", "Sprite", "Nibbler", "Hopper", "Floof", "Squeaker", "Bouncer", "Muncher", "Snuggler", "Doodlebug"],
+                types: ["Adorable Menace", "Deceptively Dangerous", "Cute Chaos Agent", "Innocent Terror", "Fuzzy Threat"],
+                appearances: [
+                    "Looks like a ball of cotton candy with huge innocent eyes. Fits in your palm. Has tiny fangs you barely notice.",
+                    "Resembles a baby bunny but with way too many ears. They wiggle adorably. Also vibrates at frequencies that shatter glass.",
+                    "Covered in pastel fur with rainbow highlights. Big sparkly eyes. Absolutely precious. Breathes concentrated acid.",
+                    "Looks exactly like a teddy bear brought to life. Soft, huggable, perfect. Can digest anything, including metal.",
+                    "Tiny dragon the size of a hamster with glittery scales. Chirps melodically. Hoards shiny things aggressively."
+                ],
+                abilities: [
+                    "Irresistible Cuteness - Victims hesitate to harm it",
+                    "Tiny Rampage - Surprising strength for its size",
+                    "Swarm Tactics - Calls dozens of identical friends",
+                    "Adorable Distraction - Makes opponents lower their guard",
+                    "Sugar Rush - Bursts of incredible speed",
+                    "Innocent Eyes - Can guilt trip anyone into feeding it",
+                    "Chaos Aura - Things randomly break around it"
+                ],
+                weaknesses: [
+                    "Easily distracted by shiny objects or treats",
+                    "Nap time is mandatory - sleeps 18 hours a day",
+                    "Scared of loud noises despite being terrifying",
+                    "Can be bribed with snacks"
+                ],
+                habitats: ["Candy forests", "Enchanted meadows", "Rainbow caves", "Cozy dungeons", "Magical gardens"],
+                lore: [
+                    "Created by a wizard who wanted a cute familiar but got the spell slightly wrong.",
+                    "Natural evolution of a species that weaponized adorableness for survival.",
+                    "A guardian spirit that chose the most disarming form possible.",
+                    "Nobody knows where they come from, but they're everywhere and impossible to get rid of."
+                ]
+            }
+        };
+
+        function random(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function randomStat() {
+            return Math.floor(Math.random() * 100) + 1;
+        }
+
+        function generateMonster() {
+            const vibe = document.getElementById('vibe').value;
+            const data = monsterData[vibe];
+
+            const name = `${random(data.prefixes)} ${random(data.suffixes)}`;
+            const dangerLevel = Math.floor(Math.random() * 5) + 1;
+            const type = random(data.types);
+            const appearance = random(data.appearances);
+            
+            const abilities = [];
+            const numAbilities = 2 + Math.floor(Math.random() * 3);
+            for (let i = 0; i < numAbilities; i++) {
+                const ability = random(data.abilities);
+                if (!abilities.includes(ability)) abilities.push(ability);
+            }
+
+            const weaknesses = [];
+            const numWeaknesses = 1 + Math.floor(Math.random() * 2);
+            for (let i = 0; i < numWeaknesses; i++) {
+                const weakness = random(data.weaknesses);
+                if (!weaknesses.includes(weakness)) weaknesses.push(weakness);
+            }
+
+            const habitat = random(data.habitats);
+            const lore = random(data.lore);
+
+            currentMonster = {
+                name,
+                vibe,
+                dangerLevel,
+                type,
+                appearance,
+                abilities,
+                weaknesses,
+                habitat,
+                lore,
+                stats: {
+                    health: randomStat(),
+                    attack: randomStat(),
+                    defense: randomStat(),
+                    speed: randomStat()
+                },
+                timestamp: new Date().toLocaleString()
+            };
+
+            displayMonster(currentMonster);
+            document.getElementById('saveBtn').disabled = false;
+            document.getElementById('expandedView').classList.remove('show');
+        }
+
+        function displayMonster(monster) {
+            document.getElementById('monsterName').textContent = monster.name;
+            
+            const skulls = '💀'.repeat(monster.dangerLevel);
+            document.getElementById('dangerLevel').innerHTML = `<span class="skull">${skulls}</span> Danger Level ${monster.dangerLevel}/5`;
+            
+            document.getElementById('monsterType').textContent = monster.type;
+            document.getElementById('appearance').textContent = monster.appearance;
+            
+            document.getElementById('abilities').innerHTML = monster.abilities
+                .map(a => `<span class="tag">${a}</span>`).join('');
+            
+            document.getElementById('weaknesses').innerHTML = monster.weaknesses
+                .map(w => `<span class="tag">${w}</span>`).join('');
+            
+            document.getElementById('habitat').textContent = monster.habitat;
+            document.getElementById('lore').textContent = monster.lore;
+
+            document.getElementById('statHealth').textContent = monster.stats.health;
+            document.getElementById('statAttack').textContent = monster.stats.attack;
+            document.getElementById('statDefense').textContent = monster.stats.defense;
+            document.getElementById('statSpeed').textContent = monster.stats.speed;
+
+            document.getElementById('monsterCard').classList.add('show');
+        }
+
+        function toggleExpanded() {
+            const expandedView = document.getElementById('expandedView');
+            expandedView.classList.toggle('show');
+        }
+
+        function saveMonster() {
+            if (!currentMonster) return;
+
+            const saved = JSON.parse(localStorage.getItem('savedMonsters') || '[]');
+            saved.unshift(currentMonster);
+            localStorage.setItem('savedMonsters', JSON.stringify(saved));
+
+            document.getElementById('saveBtn').disabled = true;
+            loadSavedMonsters();
+        }
+
+        function deleteMonster(index, event) {
+            event.stopPropagation();
+            const saved = JSON.parse(localStorage.getItem('savedMonsters') || '[]');
+            saved.splice(index, 1);
+            localStorage.setItem('savedMonsters', JSON.stringify(saved));
+            loadSavedMonsters();
+        }
+
+        function viewSavedMonster(index, event) {
+            if (event.target.classList.contains('delete-btn')) return;
+            
+            const saved = JSON.parse(localStorage.getItem('savedMonsters') || '[]');
+            const monster = saved[index];
+            
+            currentMonster = monster;
+            displayMonster(monster);
+            document.getElementById('saveBtn').disabled = true;
+            document.getElementById('expandedView').classList.add('show');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadSavedMonsters() {
+            const saved = JSON.parse(localStorage.getItem('savedMonsters') || '[]');
+            const container = document.getElementById('savedList');
+
+            if (saved.length === 0) {
+                container.innerHTML = '<div class="empty-state">No monsters saved yet. Generate and save some creatures!</div>';
+                return;
+            }
+
+            container.innerHTML = saved.map((monster, index) => `
+                <div class="saved-item" onclick="viewSavedMonster(${index}, event)">
+                    <button class="delete-btn" onclick="deleteMonster(${index}, event)">Delete</button>
+                    <h3>${monster.name}</h3>
+                    <p>${'💀'.repeat(monster.dangerLevel)} | ${monster.type}</p>
+                    <p><strong>Saved:</strong> ${monster.timestamp}</p>
+                </div>
+            `).join('');
+        }
+
+        loadSavedMonsters();
+    </script>
+</body>
+</html>
