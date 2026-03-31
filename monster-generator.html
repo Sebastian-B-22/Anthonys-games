@@ -133,23 +133,46 @@
             background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.4) 100%);
             border: 3px solid #8b6914;
             border-radius: 15px;
-            padding: 30px;
             margin-bottom: 20px;
-            cursor: pointer;
             transition: all 0.3s;
             display: none;
             box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            overflow: hidden;
         }
 
         .monster-card.show {
-            display: block;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
             animation: fadeIn 0.5s;
+        }
+
+        @media (max-width: 768px) {
+            .monster-card.show {
+                grid-template-columns: 1fr;
+            }
         }
 
         .monster-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 30px rgba(212,175,55,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
             border-color: #d4af37;
+        }
+
+        .card-left {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(139, 105, 20, 0.1) 100%);
+            padding: 30px;
+            border-right: 2px solid #8b6914;
+            cursor: pointer;
+        }
+
+        .card-right {
+            padding: 30px;
+            display: none;
+        }
+
+        .card-right.show {
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -343,27 +366,15 @@
             </div>
         </div>
 
-        <div class="monster-card" id="monsterCard" onclick="toggleExpanded()">
-            <div class="monster-name" id="monsterName"></div>
-            <div class="danger-level" id="dangerLevel"></div>
-            <div class="monster-type" id="monsterType"></div>
-            
-            <div class="click-hint">👆 Click to view full details</div>
-
-            <div class="expanded-view" id="expandedView">
+        <div class="monster-card" id="monsterCard">
+            <div class="card-left" onclick="toggleExpanded()">
+                <div class="monster-name" id="monsterName"></div>
+                <div class="danger-level" id="dangerLevel"></div>
+                <div class="monster-type" id="monsterType"></div>
+                
                 <div class="detail-section">
                     <div class="detail-title">👁️ Appearance</div>
                     <div class="detail-content" id="appearance"></div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-title">⚔️ Abilities & Powers</div>
-                    <div class="detail-content" id="abilities"></div>
-                </div>
-
-                <div class="detail-section">
-                    <div class="detail-title">💀 Weaknesses</div>
-                    <div class="detail-content" id="weaknesses"></div>
                 </div>
 
                 <div class="detail-section">
@@ -371,6 +382,10 @@
                     <div class="detail-content" id="habitat"></div>
                 </div>
 
+                <div class="click-hint">👆 Click to view full stats & abilities</div>
+            </div>
+
+            <div class="card-right" id="expandedView">
                 <div class="detail-section">
                     <div class="detail-title">🎲 Stats</div>
                     <div class="stat-grid">
@@ -391,6 +406,16 @@
                             <div id="statSpeed"></div>
                         </div>
                     </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">⚔️ Abilities & Powers</div>
+                    <div class="detail-content" id="abilities"></div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">💀 Weaknesses</div>
+                    <div class="detail-content" id="weaknesses"></div>
                 </div>
 
                 <div class="detail-section">
@@ -682,15 +707,20 @@
             document.getElementById('dangerLevel').innerHTML = `<span class="skull">${skulls}</span> Danger Level ${monster.dangerLevel}/5`;
             
             document.getElementById('monsterType').textContent = monster.type;
-            document.getElementById('appearance').textContent = monster.appearance;
             
+            // Left side - visible immediately
+            const appearanceElem = document.querySelector('.card-left #appearance');
+            const habitatElem = document.querySelector('.card-left #habitat');
+            appearanceElem.textContent = monster.appearance;
+            habitatElem.textContent = monster.habitat;
+            
+            // Right side - shown on click
             document.getElementById('abilities').innerHTML = monster.abilities
                 .map(a => `<span class="tag">${a}</span>`).join('');
             
             document.getElementById('weaknesses').innerHTML = monster.weaknesses
                 .map(w => `<span class="tag">${w}</span>`).join('');
             
-            document.getElementById('habitat').textContent = monster.habitat;
             document.getElementById('lore').textContent = monster.lore;
 
             document.getElementById('statHealth').textContent = monster.stats.health;
