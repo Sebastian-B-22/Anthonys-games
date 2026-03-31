@@ -145,26 +145,23 @@
         }
 
         .result.show {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 0;
+            display: block;
+            padding: 30px;
             animation: fadeIn 0.5s;
         }
 
-        @media (max-width: 768px) {
-            .result.show {
-                grid-template-columns: 1fr;
-            }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .area-main {
-            padding: 30px;
-        }
-
-        .area-sidebar {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(139, 105, 20, 0.1) 100%);
-            padding: 30px;
-            border-left: 2px solid #8b6914;
+        .grid-item {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #654321;
         }
 
         @keyframes fadeIn {
@@ -314,27 +311,25 @@
         </div>
 
         <div class="result" id="result">
-            <div class="area-main">
-                <div class="area-name" id="areaName"></div>
-                
-                <div class="section">
+            <div class="area-name" id="areaName"></div>
+            
+            <div class="info-grid">
+                <div class="grid-item">
                     <div class="section-title">📝 Description</div>
                     <div class="section-content" id="description"></div>
                 </div>
 
-                <div class="section">
+                <div class="grid-item">
                     <div class="section-title">👾 Creatures & Inhabitants</div>
                     <div class="section-content" id="creatures"></div>
                 </div>
-            </div>
 
-            <div class="area-sidebar">
-                <div class="section">
+                <div class="grid-item">
                     <div class="section-title">💎 Resources</div>
                     <div class="section-content" id="resources"></div>
                 </div>
 
-                <div class="section">
+                <div class="grid-item">
                     <div class="section-title">⚠️ Dangers</div>
                     <div class="section-content" id="dangers"></div>
                 </div>

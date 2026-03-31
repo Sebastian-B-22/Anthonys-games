@@ -141,16 +141,9 @@
         }
 
         .monster-card.show {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
+            display: block;
+            padding: 30px;
             animation: fadeIn 0.5s;
-        }
-
-        @media (max-width: 768px) {
-            .monster-card.show {
-                grid-template-columns: 1fr;
-            }
         }
 
         .monster-card:hover {
@@ -159,20 +152,18 @@
             border-color: #d4af37;
         }
 
-        .card-left {
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(139, 105, 20, 0.1) 100%);
-            padding: 30px;
-            border-right: 2px solid #8b6914;
-            cursor: pointer;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .card-right {
-            padding: 30px;
-            display: none;
-        }
-
-        .card-right.show {
-            display: block;
+        .grid-item {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #654321;
         }
 
         @keyframes fadeIn {
@@ -367,26 +358,22 @@
         </div>
 
         <div class="monster-card" id="monsterCard">
-            <div class="card-left" onclick="toggleExpanded()">
-                <div class="monster-name" id="monsterName"></div>
-                <div class="danger-level" id="dangerLevel"></div>
-                <div class="monster-type" id="monsterType"></div>
-                
-                <div class="detail-section">
+            <div class="monster-name" id="monsterName"></div>
+            <div class="danger-level" id="dangerLevel"></div>
+            <div class="monster-type" id="monsterType"></div>
+            
+            <div class="info-grid">
+                <div class="grid-item">
                     <div class="detail-title">👁️ Appearance</div>
                     <div class="detail-content" id="appearance"></div>
                 </div>
 
-                <div class="detail-section">
+                <div class="grid-item">
                     <div class="detail-title">🗺️ Habitat</div>
                     <div class="detail-content" id="habitat"></div>
                 </div>
 
-                <div class="click-hint">👆 Click to view full stats & abilities</div>
-            </div>
-
-            <div class="card-right" id="expandedView">
-                <div class="detail-section">
+                <div class="grid-item">
                     <div class="detail-title">🎲 Stats</div>
                     <div class="stat-grid">
                         <div class="stat-item">
@@ -408,17 +395,17 @@
                     </div>
                 </div>
 
-                <div class="detail-section">
+                <div class="grid-item">
                     <div class="detail-title">⚔️ Abilities & Powers</div>
                     <div class="detail-content" id="abilities"></div>
                 </div>
 
-                <div class="detail-section">
+                <div class="grid-item">
                     <div class="detail-title">💀 Weaknesses</div>
                     <div class="detail-content" id="weaknesses"></div>
                 </div>
 
-                <div class="detail-section">
+                <div class="grid-item">
                     <div class="detail-title">📖 Lore</div>
                     <div class="detail-content" id="lore"></div>
                 </div>
@@ -707,14 +694,9 @@
             document.getElementById('dangerLevel').innerHTML = `<span class="skull">${skulls}</span> Danger Level ${monster.dangerLevel}/5`;
             
             document.getElementById('monsterType').textContent = monster.type;
+            document.getElementById('appearance').textContent = monster.appearance;
+            document.getElementById('habitat').textContent = monster.habitat;
             
-            // Left side - visible immediately
-            const appearanceElem = document.querySelector('.card-left #appearance');
-            const habitatElem = document.querySelector('.card-left #habitat');
-            appearanceElem.textContent = monster.appearance;
-            habitatElem.textContent = monster.habitat;
-            
-            // Right side - shown on click
             document.getElementById('abilities').innerHTML = monster.abilities
                 .map(a => `<span class="tag">${a}</span>`).join('');
             
@@ -729,11 +711,6 @@
             document.getElementById('statSpeed').textContent = monster.stats.speed;
 
             document.getElementById('monsterCard').classList.add('show');
-        }
-
-        function toggleExpanded() {
-            const expandedView = document.getElementById('expandedView');
-            expandedView.classList.toggle('show');
         }
 
         function saveMonster() {
