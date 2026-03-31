@@ -13,11 +13,11 @@
 
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
-            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1a 100%);
             background-image: 
-                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(101, 67, 33, 0.1) 0%, transparent 50%);
-            color: #f4e8d0;
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 139, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            color: #e0d0e0;
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,29 +29,29 @@
 
         h1 {
             text-align: center;
-            color: #d4af37;
+            color: #c850c8;
             font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 0 20px rgba(200, 80, 200, 0.6), 2px 2px 4px rgba(0,0,0,0.8);
             letter-spacing: 2px;
             font-weight: bold;
         }
 
         .subtitle {
             text-align: center;
-            color: #c9a668;
+            color: #a040a0;
             margin-bottom: 30px;
             font-size: 1.2em;
             font-style: italic;
         }
 
         .controls {
-            background: linear-gradient(135deg, rgba(101, 67, 33, 0.4) 0%, rgba(139, 69, 19, 0.3) 100%);
-            border: 3px solid #8b6914;
+            background: linear-gradient(135deg, rgba(60, 20, 60, 0.4) 0%, rgba(80, 0, 0, 0.3) 100%);
+            border: 3px solid #8b008b;
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 8px 16px rgba(139, 0, 139, 0.4), inset 0 1px 0 rgba(200, 80, 200, 0.2);
         }
 
         .control-group {
@@ -60,19 +60,19 @@
 
         label {
             display: block;
-            color: #d4af37;
+            color: #c850c8;
             margin-bottom: 5px;
             font-weight: bold;
             font-size: 1.1em;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 0 0 10px rgba(200, 80, 200, 0.5);
         }
 
         select {
             width: 100%;
             padding: 12px;
-            background: rgba(20, 10, 5, 0.8);
-            color: #f4e8d0;
-            border: 2px solid #8b6914;
+            background: rgba(20, 5, 20, 0.8);
+            color: #e0d0e0;
+            border: 2px solid #8b008b;
             border-radius: 8px;
             font-family: 'Georgia', serif;
             font-size: 1em;
@@ -99,28 +99,28 @@
         }
 
         .generate-btn {
-            background: linear-gradient(135deg, #8b6914 0%, #d4af37 100%);
-            color: #1a0f0a;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #8b008b 0%, #c850c8 100%);
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            box-shadow: 0 4px 8px rgba(139, 0, 139, 0.5);
         }
 
         .generate-btn:hover {
-            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            background: linear-gradient(135deg, #c850c8 0%, #ff00ff 100%);
             transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(212,175,55,0.4);
+            box-shadow: 0 6px 12px rgba(200,80,200,0.6);
         }
 
         .save-btn {
-            background: linear-gradient(135deg, #654321 0%, #8b6914 100%);
-            color: #f4e8d0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #500000 0%, #8b0000 100%);
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.5);
         }
 
         .save-btn:hover {
-            background: linear-gradient(135deg, #8b6914 0%, #a0791a 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
             transform: scale(1.05);
-            box-shadow: 0 6px 12px rgba(139,105,20,0.4);
+            box-shadow: 0 6px 12px rgba(139,0,0,0.6);
         }
 
         .save-btn:disabled {
@@ -130,13 +130,13 @@
         }
 
         .monster-card {
-            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.4) 100%);
-            border: 3px solid #8b6914;
+            background: linear-gradient(135deg, rgba(60, 20, 60, 0.4) 0%, rgba(80, 0, 0, 0.4) 100%);
+            border: 3px solid #8b008b;
             border-radius: 15px;
             margin-bottom: 20px;
             transition: all 0.3s;
             display: none;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 8px 20px rgba(139, 0, 139, 0.4), inset 0 1px 0 rgba(200, 80, 200, 0.2);
             overflow: hidden;
         }
 
@@ -148,8 +148,8 @@
 
         .monster-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(212,175,55,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-            border-color: #d4af37;
+            box-shadow: 0 12px 30px rgba(200,80,200,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+            border-color: #c850c8;
         }
 
         .info-grid {
@@ -160,10 +160,10 @@
         }
 
         .grid-item {
-            background: rgba(0,0,0,0.3);
+            background: rgba(20, 5, 20, 0.5);
             padding: 20px;
             border-radius: 10px;
-            border: 2px solid #654321;
+            border: 2px solid #6b006b;
         }
 
         @keyframes fadeIn {
@@ -173,10 +173,10 @@
 
         .monster-name {
             font-size: 2.5em;
-            color: #d4af37;
+            color: #c850c8;
             margin-bottom: 10px;
             text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 0 20px rgba(200, 80, 200, 0.6), 2px 2px 4px rgba(0,0,0,0.8);
             font-weight: bold;
         }
 
@@ -184,11 +184,11 @@
             text-align: center;
             font-size: 1.5em;
             margin-bottom: 15px;
-            color: #c9a668;
+            color: #a040a0;
         }
 
         .skull {
-            color: #8b0000;
+            color: #dc143c;
         }
 
         .monster-type {
@@ -206,16 +206,16 @@
         }
 
         .detail-title {
-            color: #d4af37;
+            color: #c850c8;
             font-size: 1.3em;
             margin-bottom: 8px;
-            border-bottom: 2px solid #8b6914;
+            border-bottom: 2px solid #8b008b;
             padding-bottom: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 0 0 10px rgba(200, 80, 200, 0.5);
         }
 
         .detail-content {
-            color: #f4e8d0;
+            color: #e0d0e0;
             line-height: 1.8;
             font-size: 1.05em;
         }
@@ -228,41 +228,43 @@
         }
 
         .stat-item {
-            background: rgba(95,39,205,0.2);
+            background: rgba(60, 20, 60, 0.4);
             padding: 10px;
             border-radius: 5px;
-            border: 1px solid #5f27cd;
+            border: 1px solid #8b008b;
         }
 
         .stat-label {
-            color: #5f27cd;
+            color: #c850c8;
             font-weight: bold;
             margin-bottom: 5px;
         }
 
         .tag {
             display: inline-block;
-            background: rgba(20, 10, 5, 0.6);
+            background: rgba(40, 10, 40, 0.6);
             padding: 8px 14px;
             margin: 5px 5px 5px 0;
             border-radius: 8px;
-            border: 2px solid #8b6914;
-            color: #d4af37;
+            border: 2px solid #8b008b;
+            color: #c850c8;
             font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 4px rgba(139, 0, 139, 0.5);
         }
 
         .saved-monsters {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #5f27cd;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(60, 20, 60, 0.4) 0%, rgba(80, 0, 0, 0.3) 100%);
+            border: 3px solid #8b008b;
+            border-radius: 15px;
             padding: 20px;
+            box-shadow: 0 8px 16px rgba(139, 0, 139, 0.4), inset 0 1px 0 rgba(200, 80, 200, 0.2);
         }
 
         .saved-monsters h2 {
-            color: #5f27cd;
+            color: #c850c8;
             margin-bottom: 15px;
             text-align: center;
+            text-shadow: 0 0 20px rgba(200, 80, 200, 0.6);
         }
 
         .saved-item {
@@ -282,12 +284,13 @@
         }
 
         .saved-item h3 {
-            color: #ff4757;
+            color: #c850c8;
             margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(200, 80, 200, 0.4);
         }
 
         .saved-item p {
-            color: #bbb;
+            color: #a040a0;
             font-size: 0.9em;
         }
 
