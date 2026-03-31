@@ -12,9 +12,12 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a0b2e 100%);
-            color: #eee;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(101, 67, 33, 0.1) 0%, transparent 50%);
+            color: #f4e8d0;
             min-height: 100vh;
             padding: 20px;
         }
@@ -26,25 +29,29 @@
 
         h1 {
             text-align: center;
-            color: #ff4757;
-            font-size: 2.5em;
+            color: #d4af37;
+            font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(255,71,87,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .subtitle {
             text-align: center;
-            color: #bbb;
+            color: #c9a668;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            font-size: 1.2em;
+            font-style: italic;
         }
 
         .controls {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #ff4757;
-            border-radius: 10px;
-            padding: 20px;
+            background: linear-gradient(135deg, rgba(101, 67, 33, 0.4) 0%, rgba(139, 69, 19, 0.3) 100%);
+            border: 3px solid #8b6914;
+            border-radius: 15px;
+            padding: 25px;
             margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .control-group {
@@ -53,21 +60,24 @@
 
         label {
             display: block;
-            color: #ff4757;
+            color: #d4af37;
             margin-bottom: 5px;
             font-weight: bold;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         select {
             width: 100%;
-            padding: 10px;
-            background: #1a0b2e;
-            color: #eee;
-            border: 2px solid #ff4757;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
+            padding: 12px;
+            background: rgba(20, 10, 5, 0.8);
+            color: #f4e8d0;
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
             font-size: 1em;
             cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .buttons {
@@ -89,23 +99,28 @@
         }
 
         .generate-btn {
-            background: #ff4757;
-            color: white;
+            background: linear-gradient(135deg, #8b6914 0%, #d4af37 100%);
+            color: #1a0f0a;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
         .generate-btn:hover {
-            background: #ff6b81;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
             transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(212,175,55,0.4);
         }
 
         .save-btn {
-            background: #5f27cd;
-            color: white;
+            background: linear-gradient(135deg, #654321 0%, #8b6914 100%);
+            color: #f4e8d0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
         .save-btn:hover {
-            background: #341f97;
+            background: linear-gradient(135deg, #8b6914 0%, #a0791a 100%);
             transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(139,105,20,0.4);
         }
 
         .save-btn:disabled {
@@ -115,14 +130,15 @@
         }
 
         .monster-card {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #ff4757;
-            border-radius: 10px;
-            padding: 25px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.4) 100%);
+            border: 3px solid #8b6914;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 20px;
             cursor: pointer;
             transition: all 0.3s;
             display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .monster-card.show {
@@ -132,7 +148,8 @@
 
         .monster-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(255,71,87,0.3);
+            box-shadow: 0 12px 30px rgba(212,175,55,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            border-color: #d4af37;
         }
 
         @keyframes fadeIn {
@@ -141,20 +158,23 @@
         }
 
         .monster-name {
-            font-size: 2.2em;
-            color: #ff4757;
+            font-size: 2.5em;
+            color: #d4af37;
             margin-bottom: 10px;
             text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-weight: bold;
         }
 
         .danger-level {
             text-align: center;
             font-size: 1.5em;
             margin-bottom: 15px;
+            color: #c9a668;
         }
 
         .skull {
-            color: #ff4757;
+            color: #8b0000;
         }
 
         .monster-type {
@@ -172,16 +192,18 @@
         }
 
         .detail-title {
-            color: #5f27cd;
-            font-size: 1.2em;
+            color: #d4af37;
+            font-size: 1.3em;
             margin-bottom: 8px;
-            border-bottom: 2px solid #5f27cd;
+            border-bottom: 2px solid #8b6914;
             padding-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         .detail-content {
-            color: #ddd;
-            line-height: 1.6;
+            color: #f4e8d0;
+            line-height: 1.8;
+            font-size: 1.05em;
         }
 
         .stat-grid {
@@ -206,12 +228,14 @@
 
         .tag {
             display: inline-block;
-            background: #1a0b2e;
-            padding: 5px 10px;
+            background: rgba(20, 10, 5, 0.6);
+            padding: 8px 14px;
             margin: 5px 5px 5px 0;
-            border-radius: 5px;
-            border: 1px solid #ff4757;
-            color: #ff4757;
+            border-radius: 8px;
+            border: 2px solid #8b6914;
+            color: #d4af37;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .saved-monsters {
@@ -304,6 +328,7 @@
             <div class="control-group">
                 <label for="vibe">Monster Vibe:</label>
                 <select id="vibe">
+                    <option value="medieval">Medieval/Kingdom</option>
                     <option value="dark">Dark/Horror</option>
                     <option value="classic">Classic Fantasy</option>
                     <option value="weird">Weird/Surreal</option>
@@ -386,6 +411,40 @@
         let expandedMonster = null;
 
         const monsterData = {
+            medieval: {
+                prefixes: ["Royal", "Knight", "Castle", "Armored", "Banner", "Crown", "Shield", "Blade", "Tower", "Kingdom"],
+                suffixes: ["Guardian", "Sentinel", "Warden", "Champion", "Protector", "Beast", "Drake", "Hound", "Steed", "Rider"],
+                types: ["Kingdom Beast", "Armored Creature", "Royal Guardian", "Castle Defender", "Knightly Companion"],
+                appearances: [
+                    "A massive beast clad in ornate armor bearing the kingdom's crest. Its eyes glow with ancient loyalty.",
+                    "Covered in metallic scales that shine like polished steel. A crown of horns adorns its noble head.",
+                    "This creature's hide is naturally armored like chain mail. Ancient heraldry is etched into its plates.",
+                    "Resembles a war horse, but larger and fiercer, with battle scars and ceremonial barding.",
+                    "A majestic beast with a coat of blue and gold, matching the royal banners. Its presence commands respect."
+                ],
+                abilities: [
+                    "Battle Charge - Devastating mounted assault",
+                    "Shield Wall - Creates protective barrier",
+                    "Royal Command - Rallies nearby allies",
+                    "Honor Bound - Becomes stronger when protecting others",
+                    "Banner Call - Summons reinforcements",
+                    "Sword Dance - Rapid spinning blade attacks",
+                    "Castle Defense - Immovable when guarding territory"
+                ],
+                weaknesses: [
+                    "Heavy armor slows movement in mud or water",
+                    "Oath-bound to protect innocents, can be manipulated",
+                    "Vulnerable joints between armor plates",
+                    "Pride prevents retreat even when outmatched"
+                ],
+                habitats: ["Castle courtyards", "Kingdom borders", "Royal forests", "Mountain fortresses", "Bridge crossings"],
+                lore: [
+                    "Bred for generations to serve the royal family, these creatures are as noble as any knight.",
+                    "Once a wild beast, tamed by the kingdom's first king and bound by ancient magic to defend the realm.",
+                    "Created by court wizards to be the perfect guardian - loyal, powerful, and incorruptible.",
+                    "Survivors of an ancient war, these creatures chose to serve the kingdom that showed them mercy."
+                ]
+            },
             dark: {
                 prefixes: ["Shadow", "Void", "Nightmare", "Cursed", "Plague", "Death", "Bone", "Blood", "Corrupted", "Twisted"],
                 suffixes: ["Stalker", "Horror", "Wraith", "Beast", "Fiend", "Devourer", "Hunter", "Reaper", "Spawn", "Terror"],

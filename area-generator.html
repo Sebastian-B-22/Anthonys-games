@@ -12,9 +12,12 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #eee;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(101, 67, 33, 0.1) 0%, transparent 50%);
+            color: #f4e8d0;
             min-height: 100vh;
             padding: 20px;
         }
@@ -26,25 +29,29 @@
 
         h1 {
             text-align: center;
-            color: #f39c12;
-            font-size: 2.5em;
+            color: #d4af37;
+            font-size: 3em;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .subtitle {
             text-align: center;
-            color: #bbb;
+            color: #c9a668;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            font-size: 1.2em;
+            font-style: italic;
         }
 
         .controls {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #f39c12;
-            border-radius: 10px;
-            padding: 20px;
+            background: linear-gradient(135deg, rgba(101, 67, 33, 0.4) 0%, rgba(139, 69, 19, 0.3) 100%);
+            border: 3px solid #8b6914;
+            border-radius: 15px;
+            padding: 25px;
             margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .control-group {
@@ -53,26 +60,29 @@
 
         label {
             display: block;
-            color: #f39c12;
+            color: #d4af37;
             margin-bottom: 5px;
             font-weight: bold;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         select {
             width: 100%;
-            padding: 10px;
-            background: #0f3460;
-            color: #eee;
-            border: 2px solid #f39c12;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
+            padding: 12px;
+            background: rgba(20, 10, 5, 0.8);
+            color: #f4e8d0;
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
             font-size: 1em;
             cursor: pointer;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
 
         select:focus {
             outline: none;
-            border-color: #e67e22;
+            border-color: #d4af37;
         }
 
         .buttons {
@@ -94,23 +104,28 @@
         }
 
         .generate-btn {
-            background: #f39c12;
-            color: #1a1a2e;
+            background: linear-gradient(135deg, #8b6914 0%, #d4af37 100%);
+            color: #1a0f0a;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
         .generate-btn:hover {
-            background: #e67e22;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
             transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(212,175,55,0.4);
         }
 
         .save-btn {
-            background: #27ae60;
-            color: white;
+            background: linear-gradient(135deg, #654321 0%, #8b6914 100%);
+            color: #f4e8d0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
         .save-btn:hover {
-            background: #229954;
+            background: linear-gradient(135deg, #8b6914 0%, #a0791a 100%);
             transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(139,105,20,0.4);
         }
 
         .save-btn:disabled {
@@ -120,12 +135,13 @@
         }
 
         .result {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #27ae60;
-            border-radius: 10px;
-            padding: 25px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.4) 100%);
+            border: 3px solid #8b6914;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 20px;
             display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .result.show {
@@ -139,10 +155,12 @@
         }
 
         .area-name {
-            font-size: 2em;
-            color: #f39c12;
+            font-size: 2.5em;
+            color: #d4af37;
             margin-bottom: 15px;
             text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-weight: bold;
         }
 
         .section {
@@ -150,39 +168,45 @@
         }
 
         .section-title {
-            color: #27ae60;
+            color: #d4af37;
             font-size: 1.3em;
             margin-bottom: 8px;
-            border-bottom: 2px solid #27ae60;
+            border-bottom: 2px solid #8b6914;
             padding-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
 
         .section-content {
-            line-height: 1.6;
-            color: #ddd;
+            line-height: 1.8;
+            color: #f4e8d0;
+            font-size: 1.05em;
         }
 
         .tag {
             display: inline-block;
-            background: #0f3460;
-            padding: 5px 10px;
+            background: rgba(20, 10, 5, 0.6);
+            padding: 8px 14px;
             margin: 5px 5px 5px 0;
-            border-radius: 5px;
-            border: 1px solid #f39c12;
-            color: #f39c12;
+            border-radius: 8px;
+            border: 2px solid #8b6914;
+            color: #d4af37;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .saved-areas {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid #3498db;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(101, 67, 33, 0.4) 0%, rgba(139, 69, 19, 0.3) 100%);
+            border: 3px solid #8b6914;
+            border-radius: 15px;
             padding: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .saved-areas h2 {
-            color: #3498db;
+            color: #d4af37;
             margin-bottom: 15px;
             text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
 
         .saved-item {
@@ -195,12 +219,13 @@
         }
 
         .saved-item h3 {
-            color: #f39c12;
+            color: #d4af37;
             margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
         }
 
         .saved-item p {
-            color: #bbb;
+            color: #c9a668;
             font-size: 0.9em;
             margin-bottom: 5px;
         }
@@ -239,6 +264,7 @@
             <div class="control-group">
                 <label for="vibe">Vibe:</label>
                 <select id="vibe">
+                    <option value="medieval">Medieval/Kingdom</option>
                     <option value="dark">Dark/Horror</option>
                     <option value="classic">Classic Fantasy</option>
                     <option value="weird">Weird/Surreal</option>
@@ -303,6 +329,60 @@
         let currentArea = null;
 
         const areaData = {
+            medieval: {
+                forest: {
+                    prefixes: ["Royal", "King's", "Hunter's", "Noble", "Crown", "Sacred", "Ancient"],
+                    suffixes: ["Woods", "Forest", "Grove", "Hunting Grounds", "Timberland"],
+                    descriptions: [
+                        "Ancient trees marked with the kingdom's seal stand as natural boundaries. Hunting trails wind between massive oaks.",
+                        "Sunlight filters through a canopy where generations of royals have hunted. Stone markers show property lines.",
+                        "These woods have provided timber for castles and ships for centuries. Loggers' camps dot the clearings.",
+                        "A managed forest where game is plentiful and trails are well-maintained. Wooden watchtowers overlook the paths."
+                    ],
+                    creatures: ["Royal Deer", "Boar", "Knights on Patrol", "Forest Wardens", "Hunting Hounds", "Eagles"],
+                    resources: ["Quality Timber", "Game Meat", "Medicinal Herbs", "Bow Wood"],
+                    dangers: ["Bandits hiding from patrols", "Territorial boar", "Getting lost off marked trails", "Poacher traps"]
+                },
+                mountains: {
+                    prefixes: ["Crown", "Sentinel", "Border", "High", "Royal", "Stone"],
+                    suffixes: ["Peaks", "Range", "Mountains", "Heights", "Fortress"],
+                    descriptions: [
+                        "Ancient fortifications crown these peaks, built to watch for invaders from distant lands.",
+                        "Stone bridges and carved steps show centuries of military engineering. Beacon towers stand ready.",
+                        "Mining operations have carved deep into the mountains, extracting iron and silver for the kingdom.",
+                        "Natural caves have been expanded into barracks and armories. Supply chains wind up the slopes."
+                    ],
+                    creatures: ["Mountain Goats", "Guardian Griffins", "Stone Golems", "Watch Eagles", "Cave Bears"],
+                    resources: ["Iron Ore", "Silver", "Stone for Building", "Mountain Herbs"],
+                    dangers: ["Avalanches", "Unstable mine shafts", "Enemy scouts", "Extreme cold"]
+                },
+                ruins: {
+                    prefixes: ["Old", "Fallen", "Ancient", "Abandoned", "Lost", "Forgotten"],
+                    suffixes: ["Castle", "Keep", "Fort", "Stronghold", "Citadel"],
+                    descriptions: [
+                        "Crumbling walls tell of a siege long past. The banner poles stand empty, their colors faded by time.",
+                        "Once-proud towers now house only birds. The great hall's roof has collapsed, open to the sky.",
+                        "Moss-covered stones bear royal crests from dynasties long forgotten. Treasure hunters have searched every corner.",
+                        "The drawbridge is permanently down, chains rusted through. Water fills the moat with lily pads."
+                    ],
+                    creatures: ["Feral Dogs", "Nesting Bats", "Treasure Seekers", "Ghosts of Old Battles", "Squatters"],
+                    resources: ["Ancient Weapons", "Historical Records", "Hidden Treasures", "Cut Stone"],
+                    dangers: ["Unstable structures", "Hidden pitfalls", "Rival treasure hunters", "Cursed armories"]
+                },
+                city: {
+                    prefixes: ["King's", "Trade", "Walled", "Market", "Border", "Port"],
+                    suffixes: ["City", "Town", "Keep", "Borough", "Settlement"],
+                    descriptions: [
+                        "Stone walls enclose bustling streets where merchants hawk their wares. The castle overlooks from the hill.",
+                        "Market squares buzz with activity. Guildhalls stand proud, their standards hanging from every corner.",
+                        "Cobblestone streets wind between half-timbered buildings. Church bells mark the hours.",
+                        "The harbor district smells of salt and fish. Ships from distant lands unload exotic goods."
+                    ],
+                    creatures: ["City Guard", "Merchants", "Thieves' Guild", "Street Rats", "Noble's Horses"],
+                    resources: ["Trade Goods", "Crafted Items", "Information", "Supplies"],
+                    dangers: ["Pickpockets", "Political intrigue", "Disease in poor quarters", "Corrupt officials"]
+                }
+            },
             dark: {
                 forest: {
                     prefixes: ["Shadow", "Cursed", "Haunted", "Blackened", "Corrupted", "Twisted", "Forsaken"],
